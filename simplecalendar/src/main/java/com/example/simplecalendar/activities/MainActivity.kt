@@ -1,64 +1,40 @@
 package com.example.simplecalendar.activities
 
 import android.annotation.SuppressLint
-import android.app.SearchManager
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
-import android.database.Cursor
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Icon
 import android.graphics.drawable.LayerDrawable
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.widget.SearchView
-import androidx.core.view.MenuItemCompat
-import com.example.simplecalendar.BuildConfig
 import com.example.simplecalendar.R
 import com.example.simplecalendar.adapters.EventListAdapter
 import com.example.simplecalendar.databases.EventsDatabase
-import com.example.simplecalendar.dialogs.ExportEventsDialog
-import com.example.simplecalendar.dialogs.FilterEventTypesDialog
-import com.example.simplecalendar.dialogs.ImportEventsDialog
-import com.example.simplecalendar.dialogs.SetRemindersDialog
 import com.example.simplecalendar.extensions.*
 import com.example.simplecalendar.fragments.*
 import com.example.simplecalendar.helpers.*
 import com.example.simplecalendar.helpers.Formatter
 import com.example.simplecalendar.jobs.CalDAVUpdateListener
-import com.example.simplecalendar.models.Event
-import com.example.simplecalendar.models.EventType
 import com.example.simplecalendar.models.ListEvent
-import com.simplemobiletools.commons.dialogs.ConfirmationDialog
-import com.simplemobiletools.commons.dialogs.FilePickerDialog
-import com.simplemobiletools.commons.dialogs.RadioGroupDialog
 import com.simplemobiletools.commons.extensions.*
 import com.simplemobiletools.commons.helpers.*
 import com.simplemobiletools.commons.interfaces.RefreshRecyclerViewListener
-import com.simplemobiletools.commons.models.FAQItem
-import com.simplemobiletools.commons.models.RadioItem
-import com.simplemobiletools.commons.models.Release
 import kotlinx.android.synthetic.main.activity_main.*
 import org.joda.time.DateTime
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
     private var showCalDAVRefreshToast = false
     private var mShouldFilterBeVisible = false
-    private var mIsSearchOpen = false
     private var mLatestSearchQuery = ""
-    private var mSearchMenuItem: MenuItem? = null
     private var shouldGoToTodayBeVisible = false
     private var goToTodayButton: MenuItem? = null
     private var currentFragments = ArrayList<MyFragmentHolder>()
@@ -109,6 +85,8 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         if (savedInstanceState == null) {
             checkCalDAVUpdateListener()
         }
+
+        config.showGrid = true
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
