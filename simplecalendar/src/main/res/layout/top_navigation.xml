@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/calendar_holder">
 
     <ImageView
@@ -13,7 +12,7 @@
         android:autoMirrored="true"
         android:paddingLeft="@dimen/activity_margin"
         android:paddingRight="@dimen/activity_margin"
-        android:src="@drawable/ic_chevron_left_vector"/>
+        android:src="@drawable/ic_chevron_left_vector" />
 
     <com.simplemobiletools.commons.views.MyTextView
         android:id="@+id/top_value"
@@ -21,11 +20,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toStartOf="@+id/top_right_arrow"
+        android:layout_toLeftOf="@+id/top_right_arrow"
         android:layout_toEndOf="@+id/top_left_arrow"
+        android:layout_toRightOf="@+id/top_left_arrow"
         android:gravity="center"
         android:paddingTop="@dimen/normal_margin"
         android:paddingBottom="@dimen/normal_margin"
-        android:textSize="@dimen/month_text_size"/>
+        android:textSize="@dimen/month_text_size" />
 
     <ImageView
         android:id="@+id/top_right_arrow"
@@ -35,9 +36,10 @@
         android:layout_alignTop="@+id/top_value"
         android:layout_alignBottom="@+id/top_value"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:autoMirrored="true"
         android:paddingLeft="@dimen/activity_margin"
         android:paddingRight="@dimen/activity_margin"
-        android:src="@drawable/ic_chevron_right_vector"/>
+        android:src="@drawable/ic_chevron_right_vector" />
 
 </merge>
