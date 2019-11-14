@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
-import android.graphics.drawable.ColorDrawable
+import android.graphics.Color
 import android.graphics.drawable.Icon
 import android.graphics.drawable.LayerDrawable
 import android.os.Build
@@ -15,14 +15,12 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.simplecalendar.R
-import com.example.simplecalendar.adapters.EventListAdapter
 import com.example.simplecalendar.databases.EventsDatabase
 import com.example.simplecalendar.extensions.*
 import com.example.simplecalendar.fragments.*
 import com.example.simplecalendar.helpers.*
 import com.example.simplecalendar.helpers.Formatter
 import com.example.simplecalendar.jobs.CalDAVUpdateListener
-import com.example.simplecalendar.models.ListEvent
 import com.simplemobiletools.commons.extensions.*
 import com.simplemobiletools.commons.helpers.*
 import com.simplemobiletools.commons.interfaces.RefreshRecyclerViewListener
@@ -34,7 +32,6 @@ import kotlin.collections.ArrayList
 class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
     private var showCalDAVRefreshToast = false
     private var mShouldFilterBeVisible = false
-    private var mLatestSearchQuery = ""
     private var shouldGoToTodayBeVisible = false
     private var goToTodayButton: MenuItem? = null
     private var currentFragments = ArrayList<MyFragmentHolder>()
@@ -87,6 +84,9 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         }
 
         config.showGrid = true
+        config.primaryColor = Color.parseColor("#29a5ff")
+        config.backgroundColor = Color.WHITE
+        config.textColor = Color.BLACK
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -115,10 +115,8 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         if (config.storedView != EVENTS_LIST_VIEW) {
             updateTextColors(calendar_coordinator)
         }
-        search_placeholder.setTextColor(config.textColor)
-        search_placeholder_2.setTextColor(config.textColor)
+
         calendar_fab.setColors(config.textColor, getAdjustedPrimaryColor(), config.backgroundColor)
-        search_holder.background = ColorDrawable(config.backgroundColor)
         checkSwipeRefreshAvailability()
         checkShortcuts()
         invalidateOptionsMenu()
@@ -417,33 +415,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         }
     }
 
-    private fun searchQueryChanged(text: String) {
-        mLatestSearchQuery = text
-        search_placeholder_2.beGoneIf(text.length >= 2)
-        if (text.length >= 2) {
-            eventsHelper.getEventsWithSearchQuery(text, this) { searchedText, events ->
-                if (searchedText == mLatestSearchQuery) {
-                    search_results_list.beVisibleIf(events.isNotEmpty())
-                    search_placeholder.beVisibleIf(events.isEmpty())
-                    val listItems = getEventListItems(events)
-                    val eventsAdapter = EventListAdapter(this, listItems, true, this, search_results_list) {
-                        if (it is ListEvent) {
-                            Intent(applicationContext, EventActivity::class.java).apply {
-                                putExtra(EVENT_ID, it.id)
-                                startActivity(this)
-                            }
-                        }
-                    }
-
-                    search_results_list.adapter = eventsAdapter
-                }
-            }
-        } else {
-            search_placeholder.beVisible()
-            search_results_list.beGone()
-        }
-    }
-
     private fun checkSwipeRefreshAvailability() {
         swipe_refresh_layout.isEnabled = config.caldavSync && config.pullToRefresh && config.storedView != WEEKLY_VIEW
         if (!swipe_refresh_layout.isEnabled) {
@@ -454,7 +425,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
     // only used at active search
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     override fun refreshItems() {
-        searchQueryChanged(mLatestSearchQuery)
         refreshViewPager()
     }
 
