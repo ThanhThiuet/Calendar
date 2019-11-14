@@ -356,7 +356,7 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         bundle.putString(DAY_CODE, Formatter.getDayCodeFromDateTime(dateTime))
         fragment.arguments = bundle
         supportFragmentManager.beginTransaction().add(R.id.fragments_holder, fragment).commitNow()
-        resetActionBarTitle()
+//        resetActionBarTitle()
         calendar_fab.beVisible()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
