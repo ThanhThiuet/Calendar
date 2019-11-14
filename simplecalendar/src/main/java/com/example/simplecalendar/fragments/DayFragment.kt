@@ -1,11 +1,14 @@
 package com.example.simplecalendar.fragments
 
+import android.annotation.TargetApi
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.example.simplecalendar.R
 import com.example.simplecalendar.activities.EventActivity
@@ -47,6 +50,7 @@ class DayFragment : Fragment() {
         updateCalendar()
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private fun setupButtons() {
         mTextColor = context!!.config.textColor
 
