@@ -21,7 +21,7 @@ public class FirstActivity extends AppCompatActivity
         button = findViewById(R.id.button);
         button.setOnClickListener(v -> startActivity(new Intent(FirstActivity.this, MainActivity.class)));
         if (button == null) {
-
+            button.setOnClickListener(v -> {});
         }
     }
 }
