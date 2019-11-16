@@ -2,11 +2,13 @@ package com.example.simplecalendar.fragments
 
 import android.content.res.Resources
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.viewpager.widget.ViewPager
 import com.example.simplecalendar.R
@@ -40,6 +42,7 @@ class MonthFragmentsHolder : MyFragmentHolder(), NavigationListener {
         todayDayCode = Formatter.getTodayCode()
     }
 
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_months_holder, container, false)
         view.background = ColorDrawable(context!!.config.backgroundColor)

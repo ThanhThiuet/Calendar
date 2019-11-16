@@ -2,10 +2,12 @@ package com.example.simplecalendar.fragments
 
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import com.example.simplecalendar.R
 import com.example.simplecalendar.activities.EventActivity
 import com.example.simplecalendar.activities.MainActivity
@@ -38,6 +40,7 @@ class EventListFragment : MyFragmentHolder(), RefreshRecyclerViewListener {
 
     lateinit var mView: View
 
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mView = inflater.inflate(R.layout.fragment_event_list, container, false)
         mView.background = ColorDrawable(context!!.config.backgroundColor)

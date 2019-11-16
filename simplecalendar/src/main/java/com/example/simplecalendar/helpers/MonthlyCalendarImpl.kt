@@ -24,9 +24,9 @@ class MonthlyCalendarImpl(val callback: MonthlyCalendar, val context: Context) {
         mTargetDate = targetDate
         val startTS = mTargetDate.minusDays(7).seconds()
         val endTS = mTargetDate.plusDays(43).seconds()
-        context.eventsHelper.getEvents(startTS, endTS) {
+        context.eventsHelper.getEvents(startTS, endTS, callback = fun(it: ArrayList<Event>) {
             gotEvents(it)
-        }
+        })
     }
 
     fun getMonth(targetDate: DateTime) {
@@ -125,7 +125,12 @@ class MonthlyCalendarImpl(val callback: MonthlyCalendar, val context: Context) {
         }
 
     private fun gotEvents(events: ArrayList<Event>) {
+        val currentTimestamp = System.currentTimeMillis()
+        val listString: ArrayList<String> = ArrayList()
+        val evetn: Event = Event(0, 1573203600, 1573376400, "đây là title", "location", "des", -1, -1, -1, 0, 0, 0, 0, 0 ,0 , listString, "",  "038f74f7d9ab4312a97fb8591c8bd3dd1573892106403", 2, 1, 0, currentTimestamp ,"simple-calendar")
+//        events.add(evetn)
         mEvents = events
+//        mEvents.add(evetn)
         getDays(true)
     }
 }
