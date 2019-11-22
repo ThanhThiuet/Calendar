@@ -46,7 +46,7 @@ import java.util.regex.Pattern
 import kotlin.collections.ArrayList
 
 class EventActivity : SimpleActivity() {
-    private val LAT_LON_PATTERN = "^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)([,;])\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
+//    private val LAT_LON_PATTERN = "^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)([,;])\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
     private val EVENT = "EVENT"
     private val START_TS = "START_TS"
     private val END_TS = "END_TS"
@@ -63,15 +63,6 @@ class EventActivity : SimpleActivity() {
     private val EVENT_TYPE_ID = "EVENT_TYPE_ID"
     private val EVENT_CALENDAR_ID = "EVENT_CALENDAR_ID"
 
-    private var mReminder1Minutes = REMINDER_OFF
-    private var mReminder2Minutes = REMINDER_OFF
-    private var mReminder3Minutes = REMINDER_OFF
-    private var mReminder1Type = REMINDER_NOTIFICATION
-    private var mReminder2Type = REMINDER_NOTIFICATION
-    private var mReminder3Type = REMINDER_NOTIFICATION
-    private var mRepeatInterval = 0
-    private var mRepeatLimit = 0L
-    private var mRepeatRule = 0
     private var mEventTypeId = REGULAR_EVENT_TYPE_ID
     private var mDialogTheme = 0
     private var mEventOccurrenceTS = 0L
@@ -143,11 +134,6 @@ class EventActivity : SimpleActivity() {
             }
         } else {
             mEvent = Event(null)
-            config.apply {
-                mReminder1Minutes = if (usePreviousEventReminders) lastEventReminderMinutes1 else defaultReminder1
-                mReminder2Minutes = if (usePreviousEventReminders) lastEventReminderMinutes2 else defaultReminder2
-                mReminder3Minutes = if (usePreviousEventReminders) lastEventReminderMinutes3 else defaultReminder3
-            }
 
             if (savedInstanceState == null) {
                 setupNewEvent()
@@ -160,53 +146,12 @@ class EventActivity : SimpleActivity() {
             updateCalDAVCalendar()
         }
 
-        event_show_on_map.setOnClickListener { showOnMap() }
         event_start_date.setOnClickListener { setupStartDate() }
         event_start_time.setOnClickListener { setupStartTime() }
         event_end_date.setOnClickListener { setupEndDate() }
         event_end_time.setOnClickListener { setupEndTime() }
 
         event_all_day.setOnCheckedChangeListener { compoundButton, isChecked -> toggleAllDay(isChecked) }
-        event_repetition.setOnClickListener { showRepeatIntervalDialog() }
-        event_repetition_rule_holder.setOnClickListener { showRepetitionRuleDialog() }
-        event_repetition_limit_holder.setOnClickListener { showRepetitionTypePicker() }
-
-        event_reminder_1.setOnClickListener {
-            handleNotificationAvailability {
-                if (config.wasAlarmWarningShown) {
-                    showReminder1Dialog()
-                } else {
-                    ConfirmationDialog(this, messageId = R.string.reminder_warning, positive = R.string.ok, negative = 0) {
-                        config.wasAlarmWarningShown = true
-                        showReminder1Dialog()
-                    }
-                }
-            }
-        }
-
-        event_reminder_2.setOnClickListener { showReminder2Dialog() }
-        event_reminder_3.setOnClickListener { showReminder3Dialog() }
-
-        event_reminder_1_type.setOnClickListener {
-            showReminderTypePicker(mReminder1Type) {
-                mReminder1Type = it
-                updateReminderTypeImage(event_reminder_1_type, Reminder(mReminder1Minutes, mReminder1Type))
-            }
-        }
-
-        event_reminder_2_type.setOnClickListener {
-            showReminderTypePicker(mReminder2Type) {
-                mReminder2Type = it
-                updateReminderTypeImage(event_reminder_2_type, Reminder(mReminder2Minutes, mReminder2Type))
-            }
-        }
-
-        event_reminder_3_type.setOnClickListener {
-            showReminderTypePicker(mReminder3Type) {
-                mReminder3Type = it
-                updateReminderTypeImage(event_reminder_3_type, Reminder(mReminder3Minutes, mReminder3Type))
-            }
-        }
 
         event_type_holder.setOnClickListener { showEventTypeDialog() }
         event_all_day.apply {
@@ -252,18 +197,6 @@ class EventActivity : SimpleActivity() {
             putLong(START_TS, mEventStartDateTime.seconds())
             putLong(END_TS, mEventEndDateTime.seconds())
 
-            putInt(REMINDER_1_MINUTES, mReminder1Minutes)
-            putInt(REMINDER_2_MINUTES, mReminder2Minutes)
-            putInt(REMINDER_3_MINUTES, mReminder3Minutes)
-
-            putInt(REMINDER_1_TYPE, mReminder1Type)
-            putInt(REMINDER_2_TYPE, mReminder2Type)
-            putInt(REMINDER_3_TYPE, mReminder3Type)
-
-            putInt(REPEAT_INTERVAL, mRepeatInterval)
-            putInt(REPEAT_RULE, mRepeatRule)
-            putLong(REPEAT_LIMIT, mRepeatLimit)
-
             putString(ATTENDEES, getAllAttendees(false))
 
             putLong(EVENT_TYPE_ID, mEventTypeId)
@@ -284,18 +217,6 @@ class EventActivity : SimpleActivity() {
             mEventStartDateTime = Formatter.getDateTimeFromTS(getLong(START_TS))
             mEventEndDateTime = Formatter.getDateTimeFromTS(getLong(END_TS))
 
-            mReminder1Minutes = getInt(REMINDER_1_MINUTES)
-            mReminder2Minutes = getInt(REMINDER_2_MINUTES)
-            mReminder3Minutes = getInt(REMINDER_3_MINUTES)
-
-            mReminder1Type = getInt(REMINDER_1_TYPE)
-            mReminder2Type = getInt(REMINDER_2_TYPE)
-            mReminder3Type = getInt(REMINDER_3_TYPE)
-
-            mRepeatInterval = getInt(REPEAT_INTERVAL)
-            mRepeatRule = getInt(REPEAT_RULE)
-            mRepeatLimit = getLong(REPEAT_LIMIT)
-
             mAttendees = Gson().fromJson<ArrayList<Attendee>>(getString(ATTENDEES), object : TypeToken<List<Attendee>>() {}.type)
                     ?: ArrayList()
 
@@ -303,17 +224,14 @@ class EventActivity : SimpleActivity() {
             mEventCalendarId = getInt(EVENT_CALENDAR_ID)
         }
 
-        checkRepeatTexts(mRepeatInterval)
-        checkRepeatRule()
         updateTexts()
         updateEventType()
         updateCalDAVCalendar()
-        checkAttendees()
     }
 
     private fun updateTexts() {
-        updateRepetitionText()
-        checkReminderTexts()
+//        updateRepetitionText()
+//        checkReminderTexts()
         updateStartTexts()
         updateEndTexts()
         updateAttendeesVisibility()
@@ -331,20 +249,9 @@ class EventActivity : SimpleActivity() {
         event_location.setText(mEvent.location)
         event_description.setText(mEvent.description)
 
-        mReminder1Minutes = mEvent.reminder1Minutes
-        mReminder2Minutes = mEvent.reminder2Minutes
-        mReminder3Minutes = mEvent.reminder3Minutes
-        mReminder1Type = mEvent.reminder1Type
-        mReminder2Type = mEvent.reminder2Type
-        mReminder3Type = mEvent.reminder3Type
-        mRepeatInterval = mEvent.repeatInterval
-        mRepeatLimit = mEvent.repeatLimit
-        mRepeatRule = mEvent.repeatRule
         mEventTypeId = mEvent.eventType
         mEventCalendarId = mEvent.getCalDAVCalendarId()
         mAttendees = Gson().fromJson<ArrayList<Attendee>>(mEvent.attendees, object : TypeToken<List<Attendee>>() {}.type) ?: ArrayList()
-        checkRepeatTexts(mRepeatInterval)
-        checkAttendees()
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -390,269 +297,6 @@ class EventActivity : SimpleActivity() {
             }
             mEventEndDateTime = mEventStartDateTime.plusMinutes(addMinutes)
         }
-
-        checkAttendees()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
-    private fun checkAttendees() {
-        ensureBackgroundThread {
-            fillAvailableContacts()
-            runOnUiThread {
-                updateAttendees()
-            }
-        }
-    }
-
-    private fun handleNotificationAvailability(callback: () -> Unit) {
-        if (NotificationManagerCompat.from(applicationContext).areNotificationsEnabled()) {
-            callback()
-        } else {
-            ConfirmationDialog(this, messageId = R.string.notifications_disabled, positive = R.string.ok, negative = 0) {
-                callback()
-            }
-        }
-    }
-
-    private fun showReminder1Dialog() {
-        showPickSecondsDialogHelper(mReminder1Minutes) {
-            mReminder1Minutes = if (it <= 0) it else it / 60
-            checkReminderTexts()
-        }
-    }
-
-    private fun showReminder2Dialog() {
-        showPickSecondsDialogHelper(mReminder2Minutes) {
-            mReminder2Minutes = if (it <= 0) it else it / 60
-            checkReminderTexts()
-        }
-    }
-
-    private fun showReminder3Dialog() {
-        showPickSecondsDialogHelper(mReminder3Minutes) {
-            mReminder3Minutes = if (it <= 0) it else it / 60
-            checkReminderTexts()
-        }
-    }
-
-    private fun showRepeatIntervalDialog() {
-        showEventRepeatIntervalDialog(mRepeatInterval) {
-            setRepeatInterval(it)
-        }
-    }
-
-    private fun setRepeatInterval(interval: Int) {
-        mRepeatInterval = interval
-        updateRepetitionText()
-        checkRepeatTexts(interval)
-
-        when {
-            mRepeatInterval.isXWeeklyRepetition() -> setRepeatRule(Math.pow(2.0, (mEventStartDateTime.dayOfWeek - 1).toDouble()).toInt())
-            mRepeatInterval.isXMonthlyRepetition() -> setRepeatRule(REPEAT_SAME_DAY)
-            mRepeatInterval.isXYearlyRepetition() -> setRepeatRule(REPEAT_SAME_DAY)
-        }
-    }
-
-    private fun checkRepeatTexts(limit: Int) {
-        event_repetition_limit_holder.beGoneIf(limit == 0)
-        checkRepetitionLimitText()
-
-        event_repetition_rule_holder.beVisibleIf(mRepeatInterval.isXWeeklyRepetition() || mRepeatInterval.isXMonthlyRepetition() || mRepeatInterval.isXYearlyRepetition())
-        checkRepetitionRuleText()
-    }
-
-    private fun showRepetitionTypePicker() {
-        hideKeyboard()
-        RepeatLimitTypePickerDialog(this, mRepeatLimit, mEventStartDateTime.seconds()) {
-            setRepeatLimit(it)
-        }
-    }
-
-    private fun setRepeatLimit(limit: Long) {
-        mRepeatLimit = limit
-        checkRepetitionLimitText()
-    }
-
-    private fun checkRepetitionLimitText() {
-        event_repetition_limit.text = when {
-            mRepeatLimit == 0L -> {
-                event_repetition_limit_label.text = getString(R.string.repeat)
-                resources.getString(R.string.forever)
-            }
-            mRepeatLimit > 0 -> {
-                event_repetition_limit_label.text = getString(R.string.repeat_till)
-                val repeatLimitDateTime = Formatter.getDateTimeFromTS(mRepeatLimit)
-                Formatter.getFullDate(applicationContext, repeatLimitDateTime)
-            }
-            else -> {
-                event_repetition_limit_label.text = getString(R.string.repeat)
-                "${-mRepeatLimit} ${getString(R.string.times)}"
-            }
-        }
-    }
-
-    private fun showRepetitionRuleDialog() {
-        hideKeyboard()
-        when {
-            mRepeatInterval.isXWeeklyRepetition() -> RepeatRuleWeeklyDialog(this, mRepeatRule) {
-                setRepeatRule(it)
-            }
-            mRepeatInterval.isXMonthlyRepetition() -> {
-                val items = getAvailableMonthlyRepetitionRules()
-                RadioGroupDialog(this, items, mRepeatRule) {
-                    setRepeatRule(it as Int)
-                }
-            }
-            mRepeatInterval.isXYearlyRepetition() -> {
-                val items = getAvailableYearlyRepetitionRules()
-                RadioGroupDialog(this, items, mRepeatRule) {
-                    setRepeatRule(it as Int)
-                }
-            }
-        }
-    }
-
-    private fun getAvailableMonthlyRepetitionRules(): ArrayList<RadioItem> {
-        val items = arrayListOf(RadioItem(REPEAT_SAME_DAY, getString(R.string.repeat_on_the_same_day_monthly)))
-
-        // split Every Last Sunday and Every Fourth Sunday of the month, if the month has 4 sundays
-        if (isLastWeekDayOfMonth()) {
-            val order = (mEventStartDateTime.dayOfMonth - 1) / 7 + 1
-            if (order == 4) {
-                items.add(RadioItem(REPEAT_ORDER_WEEKDAY, getRepeatXthDayString(true, REPEAT_ORDER_WEEKDAY)))
-                items.add(RadioItem(REPEAT_ORDER_WEEKDAY_USE_LAST, getRepeatXthDayString(true, REPEAT_ORDER_WEEKDAY_USE_LAST)))
-            } else if (order == 5) {
-                items.add(RadioItem(REPEAT_ORDER_WEEKDAY_USE_LAST, getRepeatXthDayString(true, REPEAT_ORDER_WEEKDAY_USE_LAST)))
-            }
-        } else {
-            items.add(RadioItem(REPEAT_ORDER_WEEKDAY, getRepeatXthDayString(true, REPEAT_ORDER_WEEKDAY)))
-        }
-
-        if (isLastDayOfTheMonth()) {
-            items.add(RadioItem(REPEAT_LAST_DAY, getString(R.string.repeat_on_the_last_day_monthly)))
-        }
-        return items
-    }
-
-    private fun getAvailableYearlyRepetitionRules(): ArrayList<RadioItem> {
-        val items = arrayListOf(RadioItem(REPEAT_SAME_DAY, getString(R.string.repeat_on_the_same_day_yearly)))
-
-        if (isLastWeekDayOfMonth()) {
-            val order = (mEventStartDateTime.dayOfMonth - 1) / 7 + 1
-            if (order == 4) {
-                items.add(RadioItem(REPEAT_ORDER_WEEKDAY, getRepeatXthDayInMonthString(true, REPEAT_ORDER_WEEKDAY)))
-                items.add(RadioItem(REPEAT_ORDER_WEEKDAY_USE_LAST, getRepeatXthDayInMonthString(true, REPEAT_ORDER_WEEKDAY_USE_LAST)))
-            } else if (order == 5) {
-                items.add(RadioItem(REPEAT_ORDER_WEEKDAY_USE_LAST, getRepeatXthDayInMonthString(true, REPEAT_ORDER_WEEKDAY_USE_LAST)))
-            }
-        } else {
-            items.add(RadioItem(REPEAT_ORDER_WEEKDAY, getRepeatXthDayInMonthString(true, REPEAT_ORDER_WEEKDAY)))
-        }
-
-        return items
-    }
-
-    private fun isLastDayOfTheMonth() = mEventStartDateTime.dayOfMonth == mEventStartDateTime.dayOfMonth().withMaximumValue().dayOfMonth
-
-    private fun isLastWeekDayOfMonth() = mEventStartDateTime.monthOfYear != mEventStartDateTime.plusDays(7).monthOfYear
-
-    private fun getRepeatXthDayString(includeBase: Boolean, repeatRule: Int): String {
-        val dayOfWeek = mEventStartDateTime.dayOfWeek
-        val base = getBaseString(dayOfWeek)
-        val order = getOrderString(repeatRule)
-        val dayString = getDayString(dayOfWeek)
-        return if (includeBase) {
-            "$base $order $dayString"
-        } else {
-            val everyString = getString(if (isMaleGender(mEventStartDateTime.dayOfWeek)) R.string.every_m else R.string.every_f)
-            "$everyString $order $dayString"
-        }
-    }
-
-    private fun getBaseString(day: Int): String {
-        return getString(if (isMaleGender(day)) {
-            R.string.repeat_every_m
-        } else {
-            R.string.repeat_every_f
-        })
-    }
-
-    private fun isMaleGender(day: Int) = day == 1 || day == 2 || day == 4 || day == 5
-
-    private fun getOrderString(repeatRule: Int): String {
-        val dayOfMonth = mEventStartDateTime.dayOfMonth
-        var order = (dayOfMonth - 1) / 7 + 1
-        if (order == 4 && isLastWeekDayOfMonth() && repeatRule == REPEAT_ORDER_WEEKDAY_USE_LAST) {
-            order = -1
-        }
-
-        val isMale = isMaleGender(mEventStartDateTime.dayOfWeek)
-        return getString(when (order) {
-            1 -> if (isMale) R.string.first_m else R.string.first_f
-            2 -> if (isMale) R.string.second_m else R.string.second_f
-            3 -> if (isMale) R.string.third_m else R.string.third_f
-            4 -> if (isMale) R.string.fourth_m else R.string.fourth_f
-            else -> if (isMale) R.string.last_m else R.string.last_f
-        })
-    }
-
-    private fun getDayString(day: Int): String {
-        return getString(when (day) {
-            1 -> R.string.monday_alt
-            2 -> R.string.tuesday_alt
-            3 -> R.string.wednesday_alt
-            4 -> R.string.thursday_alt
-            5 -> R.string.friday_alt
-            6 -> R.string.saturday_alt
-            else -> R.string.sunday_alt
-        })
-    }
-
-    private fun getRepeatXthDayInMonthString(includeBase: Boolean, repeatRule: Int): String {
-        val weekDayString = getRepeatXthDayString(includeBase, repeatRule)
-        val monthString = resources.getStringArray(R.array.in_months)[mEventStartDateTime.monthOfYear - 1]
-        return "$weekDayString $monthString"
-    }
-
-    private fun setRepeatRule(rule: Int) {
-        mRepeatRule = rule
-        checkRepetitionRuleText()
-        if (rule == 0) {
-            setRepeatInterval(0)
-        }
-    }
-
-    private fun checkRepetitionRuleText() {
-        when {
-            mRepeatInterval.isXWeeklyRepetition() -> {
-                event_repetition_rule.text = if (mRepeatRule == EVERY_DAY_BIT) getString(R.string.every_day) else getSelectedDaysString(mRepeatRule)
-            }
-            mRepeatInterval.isXMonthlyRepetition() -> {
-                val repeatString = if (mRepeatRule == REPEAT_ORDER_WEEKDAY_USE_LAST || mRepeatRule == REPEAT_ORDER_WEEKDAY)
-                    R.string.repeat else R.string.repeat_on
-
-                event_repetition_rule_label.text = getString(repeatString)
-                event_repetition_rule.text = getMonthlyRepetitionRuleText()
-            }
-            mRepeatInterval.isXYearlyRepetition() -> {
-                val repeatString = if (mRepeatRule == REPEAT_ORDER_WEEKDAY_USE_LAST || mRepeatRule == REPEAT_ORDER_WEEKDAY)
-                    R.string.repeat else R.string.repeat_on
-
-                event_repetition_rule_label.text = getString(repeatString)
-                event_repetition_rule.text = getYearlyRepetitionRuleText()
-            }
-        }
-    }
-
-    private fun getMonthlyRepetitionRuleText() = when (mRepeatRule) {
-        REPEAT_SAME_DAY -> getString(R.string.the_same_day)
-        REPEAT_LAST_DAY -> getString(R.string.the_last_day)
-        else -> getRepeatXthDayString(false, mRepeatRule)
-    }
-
-    private fun getYearlyRepetitionRuleText() = when (mRepeatRule) {
-        REPEAT_SAME_DAY -> getString(R.string.the_same_day)
-        else -> getRepeatXthDayInMonthString(false, mRepeatRule)
     }
 
     private fun showEventTypeDialog() {
@@ -663,75 +307,11 @@ class EventActivity : SimpleActivity() {
         }
     }
 
-    private fun checkReminderTexts() {
-        updateReminder1Text()
-        updateReminder2Text()
-        updateReminder3Text()
-        updateReminderTypeImages()
-    }
-
-    private fun updateReminder1Text() {
-        event_reminder_1.text = getFormattedMinutes(mReminder1Minutes)
-    }
-
-    private fun updateReminder2Text() {
-        event_reminder_2.apply {
-            beGoneIf(event_reminder_2.isGone() && mReminder1Minutes == REMINDER_OFF)
-            if (mReminder2Minutes == REMINDER_OFF) {
-                text = resources.getString(R.string.add_another_reminder)
-                alpha = 0.4f
-            } else {
-                text = getFormattedMinutes(mReminder2Minutes)
-                alpha = 1f
-            }
-        }
-    }
-
-    private fun updateReminder3Text() {
-        event_reminder_3.apply {
-            beGoneIf(event_reminder_3.isGone() && (mReminder2Minutes == REMINDER_OFF || mReminder1Minutes == REMINDER_OFF))
-            if (mReminder3Minutes == REMINDER_OFF) {
-                text = resources.getString(R.string.add_another_reminder)
-                alpha = 0.4f
-            } else {
-                text = getFormattedMinutes(mReminder3Minutes)
-                alpha = 1f
-            }
-        }
-    }
-
-    private fun showReminderTypePicker(currentValue: Int, callback: (Int) -> Unit) {
-        val items = arrayListOf(
-                RadioItem(REMINDER_NOTIFICATION, getString(R.string.notification)),
-                RadioItem(REMINDER_EMAIL, getString(R.string.email))
-        )
-        RadioGroupDialog(this, items, currentValue) {
-            callback(it as Int)
-        }
-    }
-
-    private fun updateReminderTypeImages() {
-        updateReminderTypeImage(event_reminder_1_type, Reminder(mReminder1Minutes, mReminder1Type))
-        updateReminderTypeImage(event_reminder_2_type, Reminder(mReminder2Minutes, mReminder2Type))
-        updateReminderTypeImage(event_reminder_3_type, Reminder(mReminder3Minutes, mReminder3Type))
-    }
-
     private fun updateAttendeesVisibility() {
         val isSyncedEvent = mEventCalendarId != STORED_LOCALLY_ONLY
         event_attendees_image.beVisibleIf(isSyncedEvent)
         event_attendees_holder.beVisibleIf(isSyncedEvent)
         event_attendees_divider.beVisibleIf(isSyncedEvent)
-    }
-
-    private fun updateReminderTypeImage(view: ImageView, reminder: Reminder) {
-        view.beVisibleIf(reminder.minutes != REMINDER_OFF && mEventCalendarId != STORED_LOCALLY_ONLY)
-        val drawable = if (reminder.type == REMINDER_NOTIFICATION) R.drawable.ic_bell_vector else R.drawable.ic_email_vector
-        val icon = resources.getColoredDrawableWithColor(drawable, config.textColor)
-        view.setImageDrawable(icon)
-    }
-
-    private fun updateRepetitionText() {
-        event_repetition.text = getRepetitionText(mRepeatInterval)
     }
 
     private fun updateEventType() {
@@ -767,7 +347,6 @@ class EventActivity : SimpleActivity() {
                     mEventCalendarId = it
                     config.lastUsedCaldavCalendarId = it
                     updateCurrentCalendarInfo(getCalendarWithId(calendars, it))
-                    updateReminderTypeImages()
                     updateAttendeesVisibility()
                 }
             }
@@ -923,45 +502,13 @@ class EventActivity : SimpleActivity() {
             "$CALDAV-$mEventCalendarId"
         }
 
-        var reminders = arrayListOf(
-                Reminder(mReminder1Minutes, mReminder1Type),
-                Reminder(mReminder2Minutes, mReminder2Type),
-                Reminder(mReminder3Minutes, mReminder3Type)
-        )
-        reminders = reminders.filter { it.minutes != REMINDER_OFF }.sortedBy { it.minutes }.toMutableList() as ArrayList<Reminder>
-
-        val reminder1 = reminders.getOrNull(0) ?: Reminder(REMINDER_OFF, REMINDER_NOTIFICATION)
-        val reminder2 = reminders.getOrNull(1) ?: Reminder(REMINDER_OFF, REMINDER_NOTIFICATION)
-        val reminder3 = reminders.getOrNull(2) ?: Reminder(REMINDER_OFF, REMINDER_NOTIFICATION)
-
-        mReminder1Type = if (mEventCalendarId == STORED_LOCALLY_ONLY) REMINDER_NOTIFICATION else reminder1.type
-        mReminder2Type = if (mEventCalendarId == STORED_LOCALLY_ONLY) REMINDER_NOTIFICATION else reminder2.type
-        mReminder3Type = if (mEventCalendarId == STORED_LOCALLY_ONLY) REMINDER_NOTIFICATION else reminder3.type
-
-        config.apply {
-            if (usePreviousEventReminders) {
-                lastEventReminderMinutes1 = reminder1.minutes
-                lastEventReminderMinutes2 = reminder2.minutes
-                lastEventReminderMinutes3 = reminder3.minutes
-            }
-        }
-
         mEvent.apply {
             startTS = newStartTS
             endTS = newEndTS
             title = newTitle
             description = event_description.value
-            reminder1Minutes = reminder1.minutes
-            reminder2Minutes = reminder2.minutes
-            reminder3Minutes = reminder3.minutes
-            reminder1Type = mReminder1Type
-            reminder2Type = mReminder2Type
-            reminder3Type = mReminder3Type
-            repeatInterval = mRepeatInterval
             importId = newImportId
             flags = mEvent.flags.addBitIf(event_all_day.isChecked, FLAG_ALL_DAY)
-            repeatLimit = if (repeatInterval == 0) 0 else mRepeatLimit
-            repeatRule = mRepeatRule
             attendees = if (mEventCalendarId == STORED_LOCALLY_ONLY) "" else getAllAttendees(true)
             eventType = newEventType
             lastUpdated = System.currentTimeMillis()
@@ -981,53 +528,47 @@ class EventActivity : SimpleActivity() {
     private fun storeEvent(wasRepeatable: Boolean) {
         if (mEvent.id == null || mEvent.id == null) {
             eventsHelper.insertEvent(mEvent, true, true) {
-                if (DateTime.now().isAfter(mEventStartDateTime.millis)) {
-                    if (mEvent.repeatInterval == 0 && mEvent.getReminders().any { it.type == REMINDER_NOTIFICATION }) {
-                        notifyEvent(mEvent)
-                    }
-                }
+//                if (DateTime.now().isAfter(mEventStartDateTime.millis)) {
+//                    if (mEvent.repeatInterval == 0 && mEvent.getReminders().any { it.type == REMINDER_NOTIFICATION }) {
+//                        notifyEvent(mEvent)
+//                    }
+//                }
 
                 finish()
             }
         } else {
-            if (mRepeatInterval > 0 && wasRepeatable) {
-                runOnUiThread {
-                    showEditRepeatingEventDialog()
-                }
-            } else {
-                eventsHelper.updateEvent(mEvent, true, true) {
-                    finish()
-                }
+            eventsHelper.updateEvent(mEvent, true, true) {
+                finish()
             }
         }
     }
 
-    private fun showEditRepeatingEventDialog() {
-        EditRepeatingEventDialog(this) {
-            if (it) {
-                ensureBackgroundThread {
-                    eventsHelper.updateEvent(mEvent, true, true) {
-                        finish()
-                    }
-                }
-            } else {
-                ensureBackgroundThread {
-                    eventsHelper.addEventRepetitionException(mEvent.id!!, mEventOccurrenceTS, true)
-                    mEvent.apply {
-                        parentId = id!!.toLong()
-                        id = null
-                        repeatRule = 0
-                        repeatInterval = 0
-                        repeatLimit = 0
-                    }
-
-                    eventsHelper.insertEvent(mEvent, true, true) {
-                        finish()
-                    }
-                }
-            }
-        }
-    }
+//    private fun showEditRepeatingEventDialog() {
+//        EditRepeatingEventDialog(this) {
+//            if (it) {
+//                ensureBackgroundThread {
+//                    eventsHelper.updateEvent(mEvent, true, true) {
+//                        finish()
+//                    }
+//                }
+//            } else {
+//                ensureBackgroundThread {
+//                    eventsHelper.addEventRepetitionException(mEvent.id!!, mEventOccurrenceTS, true)
+//                    mEvent.apply {
+//                        parentId = id!!.toLong()
+//                        id = null
+//                        repeatRule = 0
+//                        repeatInterval = 0
+//                        repeatLimit = 0
+//                    }
+//
+//                    eventsHelper.insertEvent(mEvent, true, true) {
+//                        finish()
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private fun updateStartTexts() {
         updateStartDateText()
@@ -1063,33 +604,6 @@ class EventActivity : SimpleActivity() {
         val textColor = if (mEventStartDateTime.isAfter(mEventEndDateTime)) resources.getColor(R.color.red_text) else config.textColor
         event_end_date.setTextColor(textColor)
         event_end_time.setTextColor(textColor)
-    }
-
-    private fun showOnMap() {
-        if (event_location.value.isEmpty()) {
-            toast(R.string.please_fill_location)
-            return
-        }
-
-        val pattern = Pattern.compile(LAT_LON_PATTERN)
-        val locationValue = event_location.value
-        val uri = if (pattern.matcher(locationValue).find()) {
-            val delimiter = if (locationValue.contains(';')) ";" else ","
-            val parts = locationValue.split(delimiter)
-            val latitude = parts.first()
-            val longitude = parts.last()
-            Uri.parse("geo:$latitude,$longitude")
-        } else {
-            val location = Uri.encode(locationValue)
-            Uri.parse("geo:0,0?q=$location")
-        }
-
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        if (intent.resolveActivity(packageManager) != null) {
-            startActivity(intent)
-        } else {
-            toast(R.string.no_app_found)
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -1141,7 +655,6 @@ class EventActivity : SimpleActivity() {
 
             mEventStartDateTime = mEventStartDateTime.withDate(year, month + 1, day)
             updateStartDateText()
-            checkRepeatRule()
 
             mEventEndDateTime = mEventStartDateTime.plusSeconds(diff.toInt())
             updateEndTexts()
@@ -1171,73 +684,6 @@ class EventActivity : SimpleActivity() {
         }
     }
 
-    private fun checkRepeatRule() {
-        if (mRepeatInterval.isXWeeklyRepetition()) {
-            val day = mRepeatRule
-            if (day == MONDAY_BIT || day == TUESDAY_BIT || day == WEDNESDAY_BIT || day == THURSDAY_BIT || day == FRIDAY_BIT || day == SATURDAY_BIT || day == SUNDAY_BIT) {
-                setRepeatRule(Math.pow(2.0, (mEventStartDateTime.dayOfWeek - 1).toDouble()).toInt())
-            }
-        } else if (mRepeatInterval.isXMonthlyRepetition() || mRepeatInterval.isXYearlyRepetition()) {
-            if (mRepeatRule == REPEAT_LAST_DAY && !isLastDayOfTheMonth()) {
-                mRepeatRule = REPEAT_SAME_DAY
-            }
-            checkRepetitionRuleText()
-        }
-    }
-
-    private fun fillAvailableContacts() {
-        mAvailableContacts = getEmails()
-
-        val names = getNames()
-        mAvailableContacts.forEach {
-            val contactId = it.contactId
-            val contact = names.firstOrNull { it.contactId == contactId }
-            val name = contact?.name
-            if (name != null) {
-                it.name = name
-            }
-
-            val photoUri = contact?.photoUri
-            if (photoUri != null) {
-                it.photoUri = photoUri
-            }
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
-    private fun updateAttendees() {
-        val currentCalendar = calDAVHelper.getCalDAVCalendars("", true).firstOrNull { it.id == mEventCalendarId }
-        mAttendees.forEach {
-            it.isMe = it.email == currentCalendar?.accountName
-        }
-
-        mAttendees.sortWith(compareBy<Attendee>
-        { it.isMe }.thenBy
-        { it.status == CalendarContract.Attendees.ATTENDEE_STATUS_ACCEPTED }.thenBy
-        { it.status == CalendarContract.Attendees.ATTENDEE_STATUS_DECLINED }.thenBy
-        { it.status == CalendarContract.Attendees.ATTENDEE_STATUS_TENTATIVE }.thenBy
-        { it.status })
-        mAttendees.reverse()
-
-        mAttendees.forEach {
-            val attendee = it
-            val deviceContact = mAvailableContacts.firstOrNull { it.email.isNotEmpty() && it.email == attendee.email && it.photoUri.isNotEmpty() }
-            if (deviceContact != null) {
-                attendee.photoUri = deviceContact.photoUri
-            }
-            addAttendee(attendee)
-        }
-        addAttendee()
-
-        val imageHeight = event_repetition_image.height
-        if (imageHeight > 0) {
-            event_attendees_image.layoutParams.height = imageHeight
-        } else {
-            event_repetition_image.onGlobalLayout {
-                event_attendees_image.layoutParams.height = event_repetition_image.height
-            }
-        }
-    }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     private fun addAttendee(attendee: Attendee? = null) {
@@ -1401,86 +847,11 @@ class EventActivity : SimpleActivity() {
         return Gson().toJson(attendees)
     }
 
-    private fun getNames(): List<Attendee> {
-        val contacts = ArrayList<Attendee>()
-        val uri = ContactsContract.Data.CONTENT_URI
-        val projection = arrayOf(
-                ContactsContract.Data.CONTACT_ID,
-                ContactsContract.CommonDataKinds.StructuredName.PREFIX,
-                ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
-                ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME,
-                ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
-                ContactsContract.CommonDataKinds.StructuredName.SUFFIX,
-                ContactsContract.CommonDataKinds.StructuredName.PHOTO_THUMBNAIL_URI)
-
-        val selection = "${ContactsContract.Data.MIMETYPE} = ?"
-        val selectionArgs = arrayOf(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-
-        var cursor: Cursor? = null
-        try {
-            cursor = contentResolver.query(uri, projection, selection, selectionArgs, null)
-            if (cursor?.moveToFirst() == true) {
-                do {
-                    val id = cursor.getIntValue(ContactsContract.Data.CONTACT_ID)
-                    val prefix = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PREFIX) ?: ""
-                    val firstName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME) ?: ""
-                    val middleName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME) ?: ""
-                    val surname = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME) ?: ""
-                    val suffix = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.SUFFIX) ?: ""
-                    val photoUri = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PHOTO_THUMBNAIL_URI) ?: ""
-
-                    val names = arrayListOf(prefix, firstName, middleName, surname, suffix).filter { it.trim().isNotEmpty() }
-                    val fullName = TextUtils.join("", names)
-                    if (fullName.isNotEmpty() || photoUri.isNotEmpty()) {
-                        val contact = Attendee(id, fullName, "", CalendarContract.Attendees.ATTENDEE_STATUS_NONE, photoUri, false, CalendarContract.Attendees.RELATIONSHIP_NONE)
-                        contacts.add(contact)
-                    }
-                } while (cursor.moveToNext())
-            }
-        } catch (ignored: Exception) {
-        } finally {
-            cursor?.close()
-        }
-        return contacts
-    }
-
-    private fun getEmails(): ArrayList<Attendee> {
-        val contacts = ArrayList<Attendee>()
-        val uri = ContactsContract.CommonDataKinds.Email.CONTENT_URI
-        val projection = arrayOf(
-                ContactsContract.Data.CONTACT_ID,
-                ContactsContract.CommonDataKinds.Email.DATA
-        )
-
-        var cursor: Cursor? = null
-        try {
-            cursor = contentResolver.query(uri, projection, null, null, null)
-            if (cursor?.moveToFirst() == true) {
-                do {
-                    val id = cursor.getIntValue(ContactsContract.Data.CONTACT_ID)
-                    val email = cursor.getStringValue(ContactsContract.CommonDataKinds.Email.DATA) ?: continue
-                    val contact = Attendee(id, "", email, CalendarContract.Attendees.ATTENDEE_STATUS_NONE, "", false, CalendarContract.Attendees.RELATIONSHIP_NONE)
-                    contacts.add(contact)
-                } while (cursor.moveToNext())
-            }
-        } catch (ignored: Exception) {
-        } finally {
-            cursor?.close()
-        }
-        return contacts
-    }
-
     private fun updateIconColors() {
         val textColor = config.textColor
         event_time_image.applyColorFilter(textColor)
-        event_repetition_image.applyColorFilter(textColor)
-        event_reminder_image.applyColorFilter(textColor)
         event_type_image.applyColorFilter(textColor)
         event_caldav_calendar_image.applyColorFilter(textColor)
-        event_show_on_map.applyColorFilter(getAdjustedPrimaryColor())
-        event_reminder_1_type.applyColorFilter(textColor)
-        event_reminder_2_type.applyColorFilter(textColor)
-        event_reminder_3_type.applyColorFilter(textColor)
         event_attendees_image.applyColorFilter(textColor)
     }
 }

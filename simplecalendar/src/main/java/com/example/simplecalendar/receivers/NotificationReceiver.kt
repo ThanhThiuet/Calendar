@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
 import com.example.simplecalendar.extensions.eventsDB
-import com.example.simplecalendar.extensions.notifyEvent
 import com.example.simplecalendar.extensions.scheduleNextEventReminder
 import com.example.simplecalendar.extensions.updateListWidget
 import com.example.simplecalendar.helpers.EVENT_ID
@@ -36,9 +35,9 @@ class NotificationReceiver : BroadcastReceiver() {
             return
         }
 
-        if (!event.repetitionExceptions.contains(Formatter.getDayCodeFromTS(event.startTS))) {
-            context.notifyEvent(event)
-        }
+//        if (!event.repetitionExceptions.contains(Formatter.getDayCodeFromTS(event.startTS))) {
+//            context.notifyEvent(event)
+//        }
         context.scheduleNextEventReminder(event, false)
     }
 }
