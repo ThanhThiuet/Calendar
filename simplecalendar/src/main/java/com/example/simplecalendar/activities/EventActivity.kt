@@ -230,8 +230,6 @@ class EventActivity : SimpleActivity() {
     }
 
     private fun updateTexts() {
-//        updateRepetitionText()
-//        checkReminderTexts()
         updateStartTexts()
         updateEndTexts()
         updateAttendeesVisibility()
@@ -528,12 +526,6 @@ class EventActivity : SimpleActivity() {
     private fun storeEvent(wasRepeatable: Boolean) {
         if (mEvent.id == null || mEvent.id == null) {
             eventsHelper.insertEvent(mEvent, true, true) {
-//                if (DateTime.now().isAfter(mEventStartDateTime.millis)) {
-//                    if (mEvent.repeatInterval == 0 && mEvent.getReminders().any { it.type == REMINDER_NOTIFICATION }) {
-//                        notifyEvent(mEvent)
-//                    }
-//                }
-
                 finish()
             }
         } else {
@@ -542,33 +534,6 @@ class EventActivity : SimpleActivity() {
             }
         }
     }
-
-//    private fun showEditRepeatingEventDialog() {
-//        EditRepeatingEventDialog(this) {
-//            if (it) {
-//                ensureBackgroundThread {
-//                    eventsHelper.updateEvent(mEvent, true, true) {
-//                        finish()
-//                    }
-//                }
-//            } else {
-//                ensureBackgroundThread {
-//                    eventsHelper.addEventRepetitionException(mEvent.id!!, mEventOccurrenceTS, true)
-//                    mEvent.apply {
-//                        parentId = id!!.toLong()
-//                        id = null
-//                        repeatRule = 0
-//                        repeatInterval = 0
-//                        repeatLimit = 0
-//                    }
-//
-//                    eventsHelper.insertEvent(mEvent, true, true) {
-//                        finish()
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     private fun updateStartTexts() {
         updateStartDateText()
