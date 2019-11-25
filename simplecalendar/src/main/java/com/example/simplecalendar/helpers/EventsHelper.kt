@@ -269,11 +269,11 @@ class EventsHelper(val context: Context) {
             it.color = eventTypeColors.get(it.eventType) ?: primaryColor
         }
 
-        val newImportId =  UUID.randomUUID().toString().replace("-", "") + System.currentTimeMillis().toString()
-        val currentTimestamp = System.currentTimeMillis()
-        val listString: ArrayList<String> = ArrayList()
-        val evetn: Event = Event(0, 1573203600, 1573376400, "đây là title", "location", "des", -1, -1, -1, 0, 0, 0, 0, 0 ,0 , listString, "",  newImportId, 2, 1, 0, currentTimestamp ,"simple-calendar")
-        events.add(evetn)
+//        val newImportId =  UUID.randomUUID().toString().replace("-", "") + System.currentTimeMillis().toString()
+//        val currentTimestamp = System.currentTimeMillis()
+//        val listString: ArrayList<String> = ArrayList()
+//        val evetn: Event = Event(0, 1573203600, 1573376400, "đây là title", "location", "des", -1, -1, -1, 0, 0, 0, 0, 0 ,0 , listString, "",  newImportId, 2, 1, 0, currentTimestamp ,"simple-calendar")
+//        events.add(evetn)
         callback(events)
     }
 

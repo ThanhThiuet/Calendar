@@ -1,16 +1,16 @@
 package com.example.simplecalendar.extensions
 
 import android.accounts.Account
-import android.annotation.SuppressLint
-import android.app.*
+import android.app.AlarmManager
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import android.media.AudioAttributes
-import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.CalendarContract
 import android.view.Gravity
@@ -18,11 +18,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.core.app.AlarmManagerCompat
-import androidx.core.app.NotificationCompat
 import com.example.simplecalendar.R
 import com.example.simplecalendar.activities.EventActivity
-import com.example.simplecalendar.activities.SnoozeReminderActivity
 import com.example.simplecalendar.databases.EventsDatabase
 import com.example.simplecalendar.helpers.*
 import com.example.simplecalendar.helpers.Formatter
@@ -31,12 +30,10 @@ import com.example.simplecalendar.interfaces.EventsDao
 import com.example.simplecalendar.models.*
 import com.example.simplecalendar.receivers.CalDAVSyncReceiver
 import com.example.simplecalendar.receivers.NotificationReceiver
-import com.example.simplecalendar.services.SnoozeService
 import com.simplemobiletools.commons.extensions.*
-import com.simplemobiletools.commons.helpers.*
+import com.simplemobiletools.commons.helpers.ensureBackgroundThread
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.joda.time.LocalDate
 import java.util.*
 
 val Context.config: Config get() = Config.newInstance(applicationContext)
@@ -69,13 +66,6 @@ fun Context.updateListWidget() {
     }
 }
 
-fun Context.scheduleAllEvents() {
-    val events = eventsDB.getEventsAtReboot(getNowSeconds())
-    events.forEach {
-        scheduleNextEventReminder(it, false)
-    }
-}
-
 fun Context.scheduleNextEventReminder(event: Event, showToasts: Boolean) {
     val validReminders = event.getReminders().filter { it.type == REMINDER_NOTIFICATION }
     if (validReminders.isEmpty()) {
@@ -86,19 +76,7 @@ fun Context.scheduleNextEventReminder(event: Event, showToasts: Boolean) {
     }
 
     val now = getNowSeconds()
-//    val reminderSeconds = validReminders.reversed().map { it.minutes * 60 }
     eventsHelper.getEvents(now, now + YEAR, event.id!!, false) {
-//        if (it.isNotEmpty()) {
-//            for (curEvent in it) {
-//                for (curReminder in reminderSeconds) {
-//                    if (curEvent.getEventStartTS() - curReminder > now) {
-//                        scheduleEventIn((curEvent.getEventStartTS() - curReminder) * 1000L, curEvent, showToasts)
-//                        return@getEvents
-//                    }
-//                }
-//            }
-//        }
-
         if (showToasts) {
             toast(R.string.saving)
         }
@@ -156,102 +134,6 @@ fun Context.getRepetitionText(seconds: Int) = when (seconds) {
     }
 }
 
-//@SuppressLint("NewApi")
-//fun Context.getNotification(pendingIntent: PendingIntent, event: Event, content: String, publicVersion: Boolean = false): Notification {
-//    var soundUri = config.reminderSoundUri
-//    if (soundUri == SILENT) {
-//        soundUri = ""
-//    } else {
-//        soundUri?.let { grantReadUriPermission(it) }
-//    }
-//
-//    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//    // create a new channel for every new sound uri as the new Android Oreo notification system is fundamentally broken
-//    if (soundUri != config.lastSoundUri || config.lastVibrateOnReminder != config.vibrateOnReminder) {
-//        if (!publicVersion) {
-//            if (isOreoPlus()) {
-//                val oldChannelId = "simple_calendar_${config.lastReminderChannel}_${config.reminderAudioStream}_${event.eventType}"
-//                notificationManager.deleteNotificationChannel(oldChannelId)
-//            }
-//        }
-//
-//        config.lastVibrateOnReminder = config.vibrateOnReminder
-//        config.lastReminderChannel = System.currentTimeMillis()
-//        config.lastSoundUri = soundUri
-//    }
-//
-//    val channelId = "simple_calendar_${config.lastReminderChannel}_${config.reminderAudioStream}_${event.eventType}"
-//    if (isOreoPlus()) {
-//        val audioAttributes = AudioAttributes.Builder()
-//                .setUsage(AudioAttributes.USAGE_ALARM)
-//                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-//                .setLegacyStreamType(config.reminderAudioStream)
-//                .build()
-//
-//        val name = eventTypesDB.getEventTypeWithId(event.eventType)?.getDisplayTitle()
-//        val importance = NotificationManager.IMPORTANCE_HIGH
-//        NotificationChannel(channelId, name, importance).apply {
-//            setBypassDnd(true)
-//            enableLights(true)
-//            lightColor = event.color
-//            enableVibration(config.vibrateOnReminder)
-//            setSound(Uri.parse(soundUri), audioAttributes)
-//            notificationManager.createNotificationChannel(this)
-//        }
-//    }
-//
-//    val contentTitle = if (publicVersion) resources.getString(R.string.app_name) else event.title
-//    val contentText = if (publicVersion) resources.getString(R.string.public_event_notification_text) else content
-//
-//    val builder = NotificationCompat.Builder(this, channelId)
-//            .setContentTitle(contentTitle)
-//            .setContentText(contentText)
-//            .setSmallIcon(R.drawable.ic_calendar)
-//            .setContentIntent(pendingIntent)
-//            .setPriority(NotificationCompat.PRIORITY_MAX)
-//            .setDefaults(Notification.DEFAULT_LIGHTS)
-//            .setCategory(Notification.CATEGORY_EVENT)
-//            .setAutoCancel(true)
-//            .setSound(Uri.parse(soundUri), config.reminderAudioStream)
-//            .setChannelId(channelId)
-//            .addAction(R.drawable.ic_snooze_vector, getString(R.string.snooze), getSnoozePendingIntent(this, event))
-//
-//    if (config.vibrateOnReminder) {
-//        val vibrateArray = LongArray(2) { 500 }
-//        builder.setVibrate(vibrateArray)
-//    }
-//
-//    if (!publicVersion) {
-//        builder.setPublicVersion(getNotification(pendingIntent, event, content, true))
-//    }
-//
-//    val notification = builder.build()
-//    if (config.loopReminders) {
-//        notification.flags = notification.flags or Notification.FLAG_INSISTENT
-//    }
-//    return notification
-//}
-
-//private fun getFormattedEventTime(startTime: String, endTime: String) = if (startTime == endTime) startTime else "$startTime \u2013 $endTime"
-
-//private fun getPendingIntent(context: Context, event: Event): PendingIntent {
-//    val intent = Intent(context, EventActivity::class.java)
-//    intent.putExtra(EVENT_ID, event.id)
-//    intent.putExtra(EVENT_OCCURRENCE_TS, event.startTS)
-//    return PendingIntent.getActivity(context, event.id!!.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
-//}
-
-//private fun getSnoozePendingIntent(context: Context, event: Event): PendingIntent {
-//    val snoozeClass = if (context.config.useSameSnooze) SnoozeService::class.java else SnoozeReminderActivity::class.java
-//    val intent = Intent(context, snoozeClass).setAction("Snooze")
-//    intent.putExtra(EVENT_ID, event.id)
-//    return if (context.config.useSameSnooze) {
-//        PendingIntent.getService(context, event.id!!.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
-//    } else {
-//        PendingIntent.getActivity(context, event.id!!.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
-//    }
-//}
-
 fun Context.rescheduleReminder(event: Event?, minutes: Int) {
     if (event != null) {
         applicationContext.scheduleEventIn(System.currentTimeMillis() + minutes * 60000, event, false)
@@ -283,8 +165,6 @@ fun Context.getNewEventTimestampFromCode(dayCode: String): Long {
     // make sure the date doesn't change
     return newDateTime.withDate(dateTime.year, dateTime.monthOfYear, dateTime.dayOfMonth).seconds()
 }
-
-//fun Context.getSyncedCalDAVCalendars() = config.caldavSyncedCalendarIds?.let { calDAVHelper.getCalDAVCalendars(it, false) }
 
 fun Context.recheckCalDAVCalendars(callback: () -> Unit) {
     if (config.caldavSync) {
@@ -344,6 +224,7 @@ fun Context.addDayNumber(rawTextColor: Int, day: DayMonthly, linearLayout: Linea
 private fun addTodaysBackground(textView: TextView, res: Resources, dayLabelHeight: Int, primaryColor: Int) =
         textView.addResizedBackgroundDrawable(res, dayLabelHeight, primaryColor, R.drawable.ic_circle_filled)
 
+@RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
 fun Context.addDayEvents(day: DayMonthly, linearLayout: LinearLayout, res: Resources, dividerMargin: Int) {
     val eventLayoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
