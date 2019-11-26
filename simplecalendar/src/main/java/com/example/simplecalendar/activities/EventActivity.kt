@@ -3,50 +3,37 @@ package com.example.simplecalendar.activities
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.database.Cursor
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.CalendarContract
-import android.provider.ContactsContract
-import android.text.TextUtils
 import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.WindowManager
-import android.view.inputmethod.EditorInfo
-import android.widget.ImageView
-import android.widget.RelativeLayout
 import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationManagerCompat
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.example.simplecalendar.R
-import com.example.simplecalendar.adapters.AutoCompleteTextViewAdapter
-import com.example.simplecalendar.dialogs.*
+import com.example.simplecalendar.dialogs.DeleteEventDialog
+import com.example.simplecalendar.dialogs.SelectEventTypeDialog
 import com.example.simplecalendar.extensions.*
 import com.example.simplecalendar.helpers.*
 import com.example.simplecalendar.helpers.Formatter
-import com.example.simplecalendar.models.*
-import com.simplemobiletools.commons.dialogs.ConfirmationDialog
-import com.simplemobiletools.commons.dialogs.RadioGroupDialog
+import com.example.simplecalendar.models.Attendee
+import com.example.simplecalendar.models.CalDAVCalendar
+import com.example.simplecalendar.models.Event
+import com.example.simplecalendar.models.EventType
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.simplemobiletools.commons.extensions.*
-import com.simplemobiletools.commons.helpers.*
-import com.simplemobiletools.commons.models.RadioItem
-import com.simplemobiletools.commons.views.MyAutoCompleteTextView
+import com.simplemobiletools.commons.helpers.PERMISSION_READ_CONTACTS
+import com.simplemobiletools.commons.helpers.ensureBackgroundThread
 import kotlinx.android.synthetic.main.activity_event.*
-import kotlinx.android.synthetic.main.activity_event.view.*
-import kotlinx.android.synthetic.main.item_attendee.view.*
 import org.joda.time.DateTime
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.collections.ArrayList
 
 class EventActivity : SimpleActivity() {
-//    private val LAT_LON_PATTERN = "^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)([,;])\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
+    //    private val LAT_LON_PATTERN = "^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)([,;])\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$"
     private val EVENT = "EVENT"
     private val START_TS = "START_TS"
     private val END_TS = "END_TS"
@@ -227,7 +214,8 @@ class EventActivity : SimpleActivity() {
 
         mEventTypeId = mEvent.eventType
         mEventCalendarId = mEvent.getCalDAVCalendarId()
-        mAttendees = Gson().fromJson<ArrayList<Attendee>>(mEvent.attendees, object : TypeToken<List<Attendee>>() {}.type) ?: ArrayList()
+        mAttendees = Gson().fromJson<ArrayList<Attendee>>(mEvent.attendees, object : TypeToken<List<Attendee>>() {}.type)
+                ?: ArrayList()
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -236,7 +224,8 @@ class EventActivity : SimpleActivity() {
         event_title.requestFocus()
         updateActionBarTitle(getString(R.string.new_event))
         if (config.defaultEventTypeId != -1L) {
-            config.lastUsedCaldavCalendarId = mStoredEventTypes.firstOrNull { it.id == config.defaultEventTypeId }?.caldavCalendarId ?: 0
+            config.lastUsedCaldavCalendarId = mStoredEventTypes.firstOrNull { it.id == config.defaultEventTypeId }?.caldavCalendarId
+                    ?: 0
         }
 
         val isLastCaldavCalendarOK = config.caldavSync && config.getSyncedCalendarIdsAsList().contains(config.lastUsedCaldavCalendarId)
@@ -412,7 +401,8 @@ class EventActivity : SimpleActivity() {
                 }
             }
 
-            eventsHelper.getEventTypeWithCalDAVCalendarId(mEventCalendarId)?.id ?: config.lastUsedLocalEventTypeId
+            eventsHelper.getEventTypeWithCalDAVCalendarId(mEventCalendarId)?.id
+                    ?: config.lastUsedLocalEventTypeId
         }
 
         val newSource = if (!config.caldavSync || mEventCalendarId == STORED_LOCALLY_ONLY) {
