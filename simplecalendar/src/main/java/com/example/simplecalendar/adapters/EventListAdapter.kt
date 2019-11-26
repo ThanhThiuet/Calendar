@@ -9,13 +9,11 @@ import com.example.simplecalendar.dialogs.DeleteEventDialog
 import com.example.simplecalendar.extensions.config
 import com.example.simplecalendar.extensions.eventsHelper
 import com.example.simplecalendar.extensions.handleEventDeleting
-import com.example.simplecalendar.extensions.shareEvents
 import com.example.simplecalendar.helpers.*
 import com.example.simplecalendar.helpers.Formatter
 import com.example.simplecalendar.models.ListEvent
 import com.example.simplecalendar.models.ListItem
 import com.example.simplecalendar.models.ListSection
-import com.simplemobiletools.commons.adapters.MyRecyclerViewAdapter
 import com.simplemobiletools.commons.extensions.adjustAlpha
 import com.simplemobiletools.commons.extensions.applyColorFilter
 import com.simplemobiletools.commons.extensions.beInvisible
@@ -28,7 +26,7 @@ import kotlinx.android.synthetic.main.event_list_section.view.*
 import java.util.*
 
 class EventListAdapter(activity: SimpleActivity, var listItems: ArrayList<ListItem>, val allowLongClick: Boolean, val listener: RefreshRecyclerViewListener?,
-                       recyclerView: MyRecyclerView, itemClick: (Any) -> Unit) : MyRecyclerViewAdapter(activity, recyclerView, null, itemClick) {
+                       recyclerView: MyRecyclerView, itemClick: (Any) -> Unit) : MyRecyclerViewAdapter1(activity, recyclerView, null, itemClick) {
 
     private val topDivider = resources.getDrawable(R.drawable.divider_width)
     private val allDayString = resources.getString(R.string.all_day)
@@ -62,7 +60,6 @@ class EventListAdapter(activity: SimpleActivity, var listItems: ArrayList<ListIt
 
     override fun actionItemPressed(id: Int) {
         when (id) {
-            R.id.cab_share -> shareEvents()
             R.id.cab_delete -> askConfirmDelete()
         }
     }
@@ -75,7 +72,7 @@ class EventListAdapter(activity: SimpleActivity, var listItems: ArrayList<ListIt
 
     override fun getItemKeyPosition(key: Int) = listItems.indexOfFirst { (it as? ListEvent)?.hashCode() == key }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRecyclerViewAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRecyclerViewAdapter1.ViewHolder {
         val layoutId = when (viewType) {
             ITEM_EVENT -> R.layout.event_list_item
             ITEM_EVENT_SIMPLE -> R.layout.event_list_item_simple
@@ -84,7 +81,7 @@ class EventListAdapter(activity: SimpleActivity, var listItems: ArrayList<ListIt
         return createViewHolder(layoutId, parent)
     }
 
-    override fun onBindViewHolder(holder: MyRecyclerViewAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MyRecyclerViewAdapter1.ViewHolder, position: Int) {
         val listItem = listItems[position]
         holder.bindView(listItem, true, allowLongClick && listItem is ListEvent) { itemView, layoutPosition ->
             if (listItem is ListSection) {
@@ -195,8 +192,6 @@ class EventListAdapter(activity: SimpleActivity, var listItems: ArrayList<ListIt
             setTextColor(color)
         }
     }
-
-    private fun shareEvents() = activity.shareEvents(getSelectedEventIds())
 
     private fun getSelectedEventIds() = listItems.filter { it is ListEvent && selectedKeys.contains(it.hashCode()) }.map { (it as ListEvent).id }.toMutableList() as ArrayList<Long>
 
