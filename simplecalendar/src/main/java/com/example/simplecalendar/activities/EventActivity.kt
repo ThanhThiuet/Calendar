@@ -60,9 +60,6 @@ class EventActivity : SimpleActivity() {
     private var mWasActivityInitialized = false
     private var mWasContactsPermissionChecked = false
     private var mAttendees = ArrayList<Attendee>()
-    private var mAttendeeAutoCompleteViews = ArrayList<MyAutoCompleteTextView>()
-    private var mAvailableContacts = ArrayList<Attendee>()
-    private var mSelectedContacts = ArrayList<Attendee>()
     private var mStoredEventTypes = ArrayList<EventType>()
 
     private lateinit var mAttendeePlaceholder: Drawable
@@ -399,7 +396,6 @@ class EventActivity : SimpleActivity() {
             return
         }
 
-        val wasRepeatable = mEvent.repeatInterval > 0
         val oldSource = mEvent.source
         val newImportId = if (mEvent.id != null) mEvent.importId else UUID.randomUUID().toString().replace("-", "") + System.currentTimeMillis().toString()
 

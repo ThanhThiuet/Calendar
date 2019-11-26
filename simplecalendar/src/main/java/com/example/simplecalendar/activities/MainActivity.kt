@@ -389,9 +389,7 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
     private fun getFragmentsHolder() = when (config.storedView) {
         DAILY_VIEW -> DayFragmentsHolder()
         MONTHLY_VIEW -> MonthFragmentsHolder()
-        YEARLY_VIEW -> YearFragmentsHolder()
-        EVENTS_LIST_VIEW -> EventListFragment()
-        else -> WeekFragmentsHolder()
+        else -> EventListFragment()
     }
 
     private fun removeTopFragment() {

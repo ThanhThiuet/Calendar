@@ -24,7 +24,6 @@
         <activity android:name="com.example.simplecalendar.activities.SplashActivity"/>
         <activity android:name="com.example.simplecalendar.activities.ManageEventTypesActivity"/>
         <activity android:name="com.example.simplecalendar.activities.SimpleActivity"/>
-        <activity android:name="com.example.simplecalendar.activities.SnoozeReminderActivity"/>
         <activity android:name="com.example.simplecalendar.activities.WidgetListConfigureActivity"/>
         <activity android:name="com.example.simplecalendar.activities.WidgetMonthlyConfigureActivity"/>
     </application>
