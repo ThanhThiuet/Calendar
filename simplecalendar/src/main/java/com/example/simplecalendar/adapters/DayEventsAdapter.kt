@@ -9,13 +9,11 @@ import com.example.simplecalendar.dialogs.DeleteEventDialog
 import com.example.simplecalendar.extensions.config
 import com.example.simplecalendar.extensions.eventsHelper
 import com.example.simplecalendar.extensions.handleEventDeleting
-import com.example.simplecalendar.extensions.shareEvents
 import com.example.simplecalendar.helpers.Formatter
 import com.example.simplecalendar.helpers.ITEM_EVENT
 import com.example.simplecalendar.helpers.ITEM_EVENT_SIMPLE
 import com.example.simplecalendar.helpers.LOW_ALPHA
 import com.example.simplecalendar.models.Event
-import com.simplemobiletools.commons.adapters.MyRecyclerViewAdapter
 import com.simplemobiletools.commons.extensions.adjustAlpha
 import com.simplemobiletools.commons.extensions.applyColorFilter
 import com.simplemobiletools.commons.extensions.beInvisible
@@ -25,7 +23,7 @@ import com.simplemobiletools.commons.views.MyRecyclerView
 import kotlinx.android.synthetic.main.event_item_day_view.view.*
 
 class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, recyclerView: MyRecyclerView, itemClick: (Any) -> Unit)
-    : MyRecyclerViewAdapter(activity, recyclerView, null, itemClick) {
+    : MyRecyclerViewAdapter1(activity, recyclerView, null, itemClick) {
 
     private val allDayString = resources.getString(R.string.all_day)
     private val replaceDescriptionWithLocation = activity.config.replaceDescription
@@ -41,7 +39,6 @@ class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, r
 
     override fun actionItemPressed(id: Int) {
         when (id) {
-            R.id.cab_share -> shareEvents()
             R.id.cab_delete -> askConfirmDelete()
         }
     }
@@ -54,7 +51,7 @@ class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, r
 
     override fun getItemKeyPosition(key: Int) = events.indexOfFirst { it.id?.toInt() == key }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRecyclerViewAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRecyclerViewAdapter1.ViewHolder {
         val layoutId = when (viewType) {
             ITEM_EVENT -> R.layout.event_item_day_view
             else -> R.layout.event_item_day_view_simple
@@ -62,7 +59,7 @@ class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, r
         return createViewHolder(layoutId, parent)
     }
 
-    override fun onBindViewHolder(holder: MyRecyclerViewAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MyRecyclerViewAdapter1.ViewHolder, position: Int) {
         val event = events[position]
         holder.bindView(event, true, true) { itemView, layoutPosition ->
             setupView(itemView, event)
@@ -130,8 +127,6 @@ class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, r
             event_item_description?.setTextColor(newTextColor)
         }
     }
-
-    private fun shareEvents() = activity.shareEvents(selectedKeys.distinct().map { it.toLong() })
 
     private fun askConfirmDelete() {
         val eventIds = selectedKeys.map { it.toLong() }.toMutableList()

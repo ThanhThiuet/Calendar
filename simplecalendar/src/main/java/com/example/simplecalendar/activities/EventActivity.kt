@@ -149,11 +149,12 @@ class EventActivity : SimpleActivity() {
         mWasActivityInitialized = true
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_event, menu)
         if (mWasActivityInitialized) {
             menu.findItem(R.id.delete).isVisible = mEvent.id != null
-            menu.findItem(R.id.share).isVisible = mEvent.id != null
+//            menu.findItem(R.id.share).isVisible = mEvent.id != null
             menu.findItem(R.id.duplicate).isVisible = mEvent.id != null
         }
         updateMenuItemColors(menu)
@@ -165,7 +166,7 @@ class EventActivity : SimpleActivity() {
             R.id.save -> saveCurrentEvent()
             R.id.delete -> deleteEvent()
             R.id.duplicate -> duplicateEvent()
-            R.id.share -> shareEvent()
+//            R.id.share -> shareEvent()
             else -> return super.onOptionsItemSelected(item)
         }
         return true
@@ -338,9 +339,9 @@ class EventActivity : SimpleActivity() {
         resetTime()
     }
 
-    private fun shareEvent() {
-        shareEvents(arrayListOf(mEvent.id!!))
-    }
+//    private fun shareEvent() {
+//        shareEvents(arrayListOf(mEvent.id!!))
+//    }
 
     private fun deleteEvent() {
         if (mEvent.id == null) {

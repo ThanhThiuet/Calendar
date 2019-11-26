@@ -10,7 +10,6 @@ import com.example.simplecalendar.extensions.eventsHelper
 import com.example.simplecalendar.helpers.REGULAR_EVENT_TYPE_ID
 import com.example.simplecalendar.interfaces.DeleteEventTypesListener
 import com.example.simplecalendar.models.EventType
-import com.simplemobiletools.commons.adapters.MyRecyclerViewAdapter
 import com.simplemobiletools.commons.dialogs.ConfirmationDialog
 import com.simplemobiletools.commons.dialogs.RadioGroupDialog
 import com.simplemobiletools.commons.extensions.setFillWithStroke
@@ -21,7 +20,7 @@ import kotlinx.android.synthetic.main.item_event_type.view.*
 import java.util.*
 
 class ManageEventTypesAdapter(activity: SimpleActivity, val eventTypes: ArrayList<EventType>, val listener: DeleteEventTypesListener?, recyclerView: MyRecyclerView,
-                              itemClick: (Any) -> Unit) : MyRecyclerViewAdapter(activity, recyclerView, null, itemClick) {
+                              itemClick: (Any) -> Unit) : MyRecyclerViewAdapter1(activity, recyclerView, null, itemClick) {
 
     init {
         setupDragListener(true)

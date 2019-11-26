@@ -1,6 +1,7 @@
 package com.example.simplecalendar.activities
 
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.ShortcutInfo
@@ -77,7 +78,7 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
             updateViewPager()
         }
 
-        checkAppOnSDCard()
+//        checkAppOnSDCard()
 
         if (savedInstanceState == null) {
             checkCalDAVUpdateListener()
@@ -89,6 +90,7 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         config.textColor = Color.BLACK
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onResume() {
         super.onResume()
