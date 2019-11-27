@@ -59,10 +59,6 @@ class EventActivity : SimpleActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event)
 
-        if (checkAppSideloading()) {
-            return
-        }
-
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_cross_vector)
         val intent = intent ?: return
         mDialogTheme = getDialogTheme()
@@ -141,7 +137,6 @@ class EventActivity : SimpleActivity() {
         menuInflater.inflate(R.menu.menu_event, menu)
         if (mWasActivityInitialized) {
             menu.findItem(R.id.delete).isVisible = mEvent.id != null
-//            menu.findItem(R.id.share).isVisible = mEvent.id != null
             menu.findItem(R.id.duplicate).isVisible = mEvent.id != null
         }
         updateMenuItemColors(menu)
@@ -153,7 +148,6 @@ class EventActivity : SimpleActivity() {
             R.id.save -> saveCurrentEvent()
             R.id.delete -> deleteEvent()
             R.id.duplicate -> duplicateEvent()
-//            R.id.share -> shareEvent()
             else -> return super.onOptionsItemSelected(item)
         }
         return true
@@ -327,10 +321,6 @@ class EventActivity : SimpleActivity() {
         event_end_time.beGoneIf(isChecked)
         resetTime()
     }
-
-//    private fun shareEvent() {
-//        shareEvents(arrayListOf(mEvent.id!!))
-//    }
 
     private fun deleteEvent() {
         if (mEvent.id == null) {
