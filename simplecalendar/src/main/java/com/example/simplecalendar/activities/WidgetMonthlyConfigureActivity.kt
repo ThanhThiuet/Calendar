@@ -6,10 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import com.example.simplecalendar.R
 import com.example.simplecalendar.extensions.addDayEvents
 import com.example.simplecalendar.extensions.addDayNumber
@@ -44,6 +46,7 @@ class WidgetMonthlyConfigureActivity : SimpleActivity(), MonthlyCalendar {
     private var mWeakTextColor = 0
     private var mPrimaryColor = 0
 
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     public override fun onCreate(savedInstanceState: Bundle?) {
         useDynamicTheme = false
         super.onCreate(savedInstanceState)
@@ -64,6 +67,7 @@ class WidgetMonthlyConfigureActivity : SimpleActivity(), MonthlyCalendar {
         config_bg_seekbar.setColors(mTextColor, mPrimaryColor, mPrimaryColor)
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onResume() {
         super.onResume()
         window.decorView.setBackgroundColor(0)
@@ -114,6 +118,7 @@ class WidgetMonthlyConfigureActivity : SimpleActivity(), MonthlyCalendar {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     private fun pickTextColor() {
         ColorPickerDialog(this, mTextColor) { wasPositivePressed, color ->
             if (wasPositivePressed) {
@@ -151,6 +156,7 @@ class WidgetMonthlyConfigureActivity : SimpleActivity(), MonthlyCalendar {
         config_save.setBackgroundColor(mBgColor)
     }
 
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     private fun updateDays() {
         val len = mDays!!.size
 
@@ -194,6 +200,7 @@ class WidgetMonthlyConfigureActivity : SimpleActivity(), MonthlyCalendar {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun updateMonthlyCalendar(context: Context, month: String, days: ArrayList<DayMonthly>, checkedEvents: Boolean, currTargetDate: DateTime) {
         runOnUiThread {
             mDays = days
