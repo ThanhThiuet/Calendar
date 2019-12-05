@@ -66,58 +66,6 @@ fun Context.updateListWidget() {
     }
 }
 
-fun Context.scheduleNextEventReminder(event: Event, showToasts: Boolean) {
-    val validReminders = event.getReminders().filter { it.type == REMINDER_NOTIFICATION }
-    if (validReminders.isEmpty()) {
-        if (showToasts) {
-            toast(R.string.saving)
-        }
-        return
-    }
-
-    val now = getNowSeconds()
-    eventsHelper.getEvents(now, now + YEAR, event.id!!, false) {
-        if (showToasts) {
-            toast(R.string.saving)
-        }
-    }
-}
-
-fun Context.scheduleEventIn(notifTS: Long, event: Event, showToasts: Boolean) {
-    if (notifTS < System.currentTimeMillis()) {
-        if (showToasts) {
-            toast(R.string.saving)
-        }
-        return
-    }
-
-    val newNotifTS = notifTS + 1000
-    if (showToasts) {
-        val secondsTillNotification = (newNotifTS - System.currentTimeMillis()) / 1000
-        val msg = String.format(getString(R.string.reminder_triggers_in), formatSecondsToTimeString(secondsTillNotification.toInt()))
-        toast(msg)
-    }
-
-    val pendingIntent = getNotificationIntent(applicationContext, event)
-    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    try {
-        AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, newNotifTS, pendingIntent)
-    } catch (e: Exception) {
-        showErrorToast(e)
-    }
-}
-
-fun Context.cancelNotification(id: Long) {
-    (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(id.toInt())
-}
-
-private fun getNotificationIntent(context: Context, event: Event): PendingIntent {
-    val intent = Intent(context, NotificationReceiver::class.java)
-    intent.putExtra(EVENT_ID, event.id)
-    intent.putExtra(EVENT_OCCURRENCE_TS, event.startTS)
-    return PendingIntent.getBroadcast(context, event.id!!.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
-}
-
 fun Context.getRepetitionText(seconds: Int) = when (seconds) {
     0 -> getString(R.string.no_repetition)
     DAY -> getString(R.string.daily)
@@ -131,13 +79,6 @@ fun Context.getRepetitionText(seconds: Int) = when (seconds) {
             seconds % WEEK == 0 -> resources.getQuantityString(R.plurals.weeks, seconds / WEEK, seconds / WEEK)
             else -> resources.getQuantityString(R.plurals.days, seconds / DAY, seconds / DAY)
         }
-    }
-}
-
-fun Context.rescheduleReminder(event: Event?, minutes: Int) {
-    if (event != null) {
-        applicationContext.scheduleEventIn(System.currentTimeMillis() + minutes * 60000, event, false)
-        cancelNotification(event.id!!)
     }
 }
 

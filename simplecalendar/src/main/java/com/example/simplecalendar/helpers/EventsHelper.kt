@@ -1,7 +1,9 @@
 package com.example.simplecalendar.helpers
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import androidx.collection.LongSparseArray
 import com.example.simplecalendar.R
 import com.example.simplecalendar.extensions.*
@@ -9,6 +11,7 @@ import com.example.simplecalendar.models.Event
 import com.example.simplecalendar.models.EventType
 import com.simplemobiletools.commons.extensions.getChoppedList
 import com.simplemobiletools.commons.helpers.ensureBackgroundThread
+import org.joda.time.DateTime
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -16,6 +19,9 @@ class EventsHelper(val context: Context) {
     private val config = context.config
     private val eventsDB = context.eventsDB
     private val eventTypesDB = context.eventTypesDB
+    companion object {
+        var eventTest: Event = Event(null)
+    }
 
     fun getEventTypes(activity: Activity, showWritableOnly: Boolean, callback: (notes: ArrayList<EventType>) -> Unit) {
         ensureBackgroundThread {
@@ -96,7 +102,6 @@ class EventsHelper(val context: Context) {
         event.id = eventsDB.insertOrUpdate(event)
 
         context.updateWidgets()
-        context.scheduleNextEventReminder(event, showToasts)
 
         if (addToCalDAV && event.source != SOURCE_SIMPLE_CALENDAR && config.caldavSync) {
             context.calDAVHelper.insertCalDAVEvent(event)
@@ -114,7 +119,6 @@ class EventsHelper(val context: Context) {
 
                 event.id = eventsDB.insertOrUpdate(event)
 
-                context.scheduleNextEventReminder(event, false)
                 if (addToCalDAV && event.source != SOURCE_SIMPLE_CALENDAR && event.source != SOURCE_IMPORTED_ICS && config.caldavSync) {
                     context.calDAVHelper.insertCalDAVEvent(event)
                 }
@@ -128,7 +132,6 @@ class EventsHelper(val context: Context) {
         eventsDB.insertOrUpdate(event)
 
         context.updateWidgets()
-        context.scheduleNextEventReminder(event, showToasts)
         if (updateAtCalDAV && event.source != SOURCE_SIMPLE_CALENDAR && config.caldavSync) {
             context.calDAVHelper.updateCalDAVEvent(event)
         }
@@ -152,10 +155,6 @@ class EventsHelper(val context: Context) {
         ids.getChoppedList().forEach {
             val eventsWithImportId = eventsDB.getEventsByIdsWithImportIds(it)
             eventsDB.deleteEvents(it)
-
-            it.forEach {
-                context.cancelNotification(it)
-            }
 
             if (deleteFromCalDAV && config.caldavSync) {
                 eventsWithImportId.forEach {
@@ -199,27 +198,21 @@ class EventsHelper(val context: Context) {
         }
     }
 
-    fun getEventsWithSearchQuery(text: String, activity: Activity, callback: (searchedText: String, events: List<Event>) -> Unit) {
-        ensureBackgroundThread {
-            val searchQuery = "%$text%"
-            val events = eventsDB.getEventsForSearch(searchQuery)
-            val displayEventTypes = config.displayEventTypes
-            val filteredEvents = events.filter { displayEventTypes.contains(it.eventType.toString()) }
-            activity.runOnUiThread {
-                callback(text, filteredEvents)
-            }
-        }
-    }
+//    fun getEventsWithSearchQuery(text: String, activity: Activity, callback: (searchedText: String, events: List<Event>) -> Unit) {
+//        ensureBackgroundThread {
+//            val searchQuery = "%$text%"
+//            val events = eventsDB.getEventsForSearch(searchQuery)
+//            val displayEventTypes = config.displayEventTypes
+//            val filteredEvents = events.filter { displayEventTypes.contains(it.eventType.toString()) }
+//            activity.runOnUiThread {
+//                callback(text, filteredEvents)
+//            }
+//        }
+//    }
 
     fun addEventRepetitionException(parentEventId: Long, occurrenceTS: Long, addToCalDAV: Boolean) {
         ensureBackgroundThread {
             val parentEvent = eventsDB.getEventWithId(parentEventId) ?: return@ensureBackgroundThread
-            var repetitionExceptions = parentEvent.repetitionExceptions
-            repetitionExceptions.add(Formatter.getDayCodeFromTS(occurrenceTS))
-            repetitionExceptions = repetitionExceptions.distinct().toMutableList() as ArrayList<String>
-
-            eventsDB.updateEventRepetitionExceptions(repetitionExceptions.toString(), parentEventId)
-            context.scheduleNextEventReminder(parentEvent, false)
 
             if (addToCalDAV && config.caldavSync) {
                 context.calDAVHelper.insertEventRepeatException(parentEvent, occurrenceTS)
@@ -233,6 +226,7 @@ class EventsHelper(val context: Context) {
         }
     }
 
+    @SuppressLint("LongLogTag")
     fun getEventsSync(fromTS: Long, toTS: Long, eventId: Long = -1L, applyTypeFilter: Boolean, callback: (events: ArrayList<Event>) -> Unit) {
         var events = if (applyTypeFilter) {
             val displayEventTypes = context.config.displayEventTypes
@@ -266,14 +260,28 @@ class EventsHelper(val context: Context) {
         val primaryColor = context.resources.getColor(R.color.color_primary)
         events.forEach {
             it.updateIsPastEvent()
+            Log.e("EventsHelper.class_forEach", "" + it.getCalDAVCalendarId() + " - " + it.getCalDAVEventId() + " - " + it.id + " - " + it.getEventStartTS() + " - " + it.startTS + " - " + it.eventType + " - " + it.importId)
             it.color = eventTypeColors.get(it.eventType) ?: primaryColor
         }
 
-//        val newImportId =  UUID.randomUUID().toString().replace("-", "") + System.currentTimeMillis().toString()
-//        val currentTimestamp = System.currentTimeMillis()
-//        val listString: ArrayList<String> = ArrayList()
-//        val evetn: Event = Event(0, 1573203600, 1573376400, "đây là title", "location", "des", -1, -1, -1, 0, 0, 0, 0, 0 ,0 , listString, "",  newImportId, 2, 1, 0, currentTimestamp ,"simple-calendar")
-//        events.add(evetn)
+
+
+        val newImportId = "b08747857cb44e1b879c837b9e016e091575271897414" /*""*/ /*UUID.randomUUID().toString().replace("-", "") + System.currentTimeMillis().toString()*/
+        val currentTimestamp = System.currentTimeMillis()
+        val listString: ArrayList<String> = ArrayList()
+        val date: DateTime = Formatter.getDateTimeFromTS(currentTimestamp / 1000L)
+        val startDate: DateTime = date.withDate(2019, 12, 10).withHourOfDay(7).withMinuteOfHour(0)
+        val endDate: DateTime = date.withDate(2019, 12, 12).withHourOfDay(7).withMinuteOfHour(0)
+
+        eventTest = Event(/*REGULAR_EVENT_TYPE_ID*/12, startDate.seconds(), endDate.seconds(), "đây là title", "location", "des", -1, -1, -1, 0, 0, 0, 0, 0 ,0 , listString, "",  newImportId, 0, 1, 0, currentTimestamp , SOURCE_SIMPLE_CALENDAR)
+        eventTest.updateIsPastEvent()
+        eventTest.color = config.primaryColor
+        Log.e("EventsHelper.class_addEventTest", "" + eventTest.getCalDAVCalendarId() + " - " + eventTest.getCalDAVEventId() + " - " + eventTest.id + " - " + eventTest.getEventStartTS() + " - " + eventTest.startTS + " - " + eventTest.eventType + " - " + eventTest.importId)
+//        evetn.isPastEvent = true
+
+        config.displayEventTypes
+        events.add(eventTest)
+
         callback(events)
     }
 
