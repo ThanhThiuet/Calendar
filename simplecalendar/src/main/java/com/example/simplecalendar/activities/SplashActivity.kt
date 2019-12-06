@@ -1,7 +1,6 @@
 package com.example.simplecalendar.activities
 
 import android.content.Intent
-import androidx.core.content.ContextCompat.startActivity
 import com.example.simplecalendar.extensions.getNewEventTimestampFromCode
 import com.example.simplecalendar.helpers.*
 import com.simplemobiletools.commons.activities.BaseSplashActivity
