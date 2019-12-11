@@ -78,8 +78,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
             updateViewPager()
         }
 
-//        checkAppOnSDCard()
-
         if (savedInstanceState == null) {
             checkCalDAVUpdateListener()
         }
@@ -88,6 +86,7 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         config.primaryColor = Color.parseColor("#29a5ff")
         config.backgroundColor = Color.WHITE
         config.textColor = Color.BLACK
+        config.isSundayFirst = false // week starts at Monday
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

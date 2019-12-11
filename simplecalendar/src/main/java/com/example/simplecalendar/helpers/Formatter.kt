@@ -83,7 +83,7 @@ object Formatter {
     fun getUTCDateTimeFromTS(ts: Long) = DateTime(ts * 1000L, DateTimeZone.UTC)
 
     // use manually translated month names, as DateFormat and Joda have issues with a lot of languages
-    fun getMonthName(context: Context, id: Int) = context.resources.getStringArray(R.array.months)[id - 1]
+    fun getMonthName(context: Context, id: Int) = context.resources.getStringArray(R.array.months_vietnamese)[id - 1]
 
     fun getHourPattern(context: Context) = if (context.config.use24HourFormat) PATTERN_HOURS_24 else PATTERN_HOURS_12
 
