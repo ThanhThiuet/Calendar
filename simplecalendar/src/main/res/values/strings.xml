@@ -288,6 +288,7 @@
         https://github.com/SimpleMobileTools/Simple-Commons/tree/master/commons/src/main/res
     -->
 
+    <!-- Month name in Vietnamese -->
     <string name="january" translatable="false">Tháng 1</string>
     <string name="february" translatable="false">Tháng 2</string>
     <string name="march" translatable="false">Tháng 3</string>
@@ -300,4 +301,13 @@
     <string name="october" translatable="false">Tháng 10</string>
     <string name="november" translatable="false">Tháng 11</string>
     <string name="december" translatable="false">Tháng 12</string>
+
+    <!-- Day name with number -->
+    <string name="monday_letter" translatable="false">T2</string>
+    <string name="tuesday_letter" translatable="false">T3</string>
+    <string name="wednesday_letter" translatable="false">T4</string>
+    <string name="thursday_letter" translatable="false">T5</string>
+    <string name="friday_letter" translatable="false">T6</string>
+    <string name="saturday_letter" translatable="false">T7</string>
+    <string name="sunday_letter" translatable="false">CN</string>
 </resources>
