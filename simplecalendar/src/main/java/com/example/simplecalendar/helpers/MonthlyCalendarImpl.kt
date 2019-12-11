@@ -116,21 +116,14 @@ class MonthlyCalendarImpl(val callback: MonthlyCalendar, val context: Context) {
 
     private val monthName: String
         get() {
-            var month = Formatter.getMonthName(context, mTargetDate.monthOfYear) // lấy tên tháng và hiển thị
+            var month = Formatter.getMonthName(context, mTargetDate.monthOfYear) // lấy tên tháng tương ứng theo tiếng Việt để hiển thị
             val targetYear = mTargetDate.toString(YEAR_PATTERN)
-            if (targetYear != DateTime().toString(YEAR_PATTERN)) {
-                month += " $targetYear"
-            }
+            month += " $targetYear"
             return month
         }
 
     private fun gotEvents(events: ArrayList<Event>) {
-//        val currentTimestamp = System.currentTimeMillis()
-//        val listString: ArrayList<String> = ArrayList()
-//        val evetn: Event = Event(0, 1573203600, 1573376400, "đây là title", "location", "des", -1, -1, -1, 0, 0, 0, 0, 0 ,0 , listString, "",  "038f74f7d9ab4312a97fb8591c8bd3dd1573892106403", 2, 1, 0, currentTimestamp ,"simple-calendar")
-//        events.add(evetn)
         mEvents = events
-//        mEvents.add(evetn)
         getDays(true)
     }
 }
