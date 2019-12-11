@@ -78,8 +78,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
             updateViewPager()
         }
 
-//        checkAppOnSDCard()
-
         if (savedInstanceState == null) {
             checkCalDAVUpdateListener()
         }

@@ -287,4 +287,17 @@
         Haven't found some strings? There's more at
         https://github.com/SimpleMobileTools/Simple-Commons/tree/master/commons/src/main/res
     -->
+
+    <string name="january" translatable="false">Tháng 1</string>
+    <string name="february" translatable="false">Tháng 2</string>
+    <string name="march" translatable="false">Tháng 3</string>
+    <string name="april" translatable="false">Tháng 4</string>
+    <string name="may" translatable="false">Tháng 5</string>
+    <string name="june" translatable="false">Tháng 6</string>
+    <string name="july" translatable="false">Tháng 7</string>
+    <string name="august" translatable="false">Tháng 8</string>
+    <string name="september" translatable="false">Tháng 9</string>
+    <string name="october" translatable="false">Tháng 10</string>
+    <string name="november" translatable="false">Tháng 11</string>
+    <string name="december" translatable="false">Tháng 12</string>
 </resources>

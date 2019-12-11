@@ -116,7 +116,7 @@ class MonthlyCalendarImpl(val callback: MonthlyCalendar, val context: Context) {
 
     private val monthName: String
         get() {
-            var month = Formatter.getMonthName(context, mTargetDate.monthOfYear)
+            var month = Formatter.getMonthName(context, mTargetDate.monthOfYear) // lấy tên tháng và hiển thị
             val targetYear = mTargetDate.toString(YEAR_PATTERN)
             if (targetYear != DateTime().toString(YEAR_PATTERN)) {
                 month += " $targetYear"
