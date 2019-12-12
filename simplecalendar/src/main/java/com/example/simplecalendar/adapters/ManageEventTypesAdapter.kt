@@ -72,26 +72,26 @@ class ManageEventTypesAdapter(activity: SimpleActivity, val eventTypes: ArrayLis
     private fun askConfirmDelete() {
         val eventTypes = eventTypes.filter { selectedKeys.contains(it.id?.toInt()) }.map { it.id } as ArrayList<Long>
 
-        activity.eventsHelper.doEventTypesContainEvents(eventTypes) {
-            activity.runOnUiThread {
-                if (it) {
-                    val MOVE_EVENTS = 0
-                    val DELETE_EVENTS = 1
-                    val res = activity.resources
-                    val items = ArrayList<RadioItem>().apply {
-                        add(RadioItem(MOVE_EVENTS, res.getString(R.string.move_events_into_default)))
-                        add(RadioItem(DELETE_EVENTS, res.getString(R.string.remove_affected_events)))
-                    }
-                    RadioGroupDialog(activity, items) {
-                        deleteEventTypes(it == DELETE_EVENTS)
-                    }
-                } else {
-                    ConfirmationDialog(activity) {
-                        deleteEventTypes(true)
-                    }
-                }
-            }
-        }
+//        activity.eventsHelper.doEventTypesContainEvents(eventTypes) {
+//            activity.runOnUiThread {
+//                if (it) {
+//                    val MOVE_EVENTS = 0
+//                    val DELETE_EVENTS = 1
+//                    val res = activity.resources
+//                    val items = ArrayList<RadioItem>().apply {
+//                        add(RadioItem(MOVE_EVENTS, res.getString(R.string.move_events_into_default)))
+//                        add(RadioItem(DELETE_EVENTS, res.getString(R.string.remove_affected_events)))
+//                    }
+//                    RadioGroupDialog(activity, items) {
+//                        deleteEventTypes(it == DELETE_EVENTS)
+//                    }
+//                } else {
+//                    ConfirmationDialog(activity) {
+//                        deleteEventTypes(true)
+//                    }
+//                }
+//            }
+//        }
     }
 
     private fun deleteEventTypes(deleteEvents: Boolean) {

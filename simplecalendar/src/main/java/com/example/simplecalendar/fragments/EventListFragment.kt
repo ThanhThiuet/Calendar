@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import com.example.simplecalendar.R
-import com.example.simplecalendar.activities.EventActivity
 import com.example.simplecalendar.activities.MainActivity
 import com.example.simplecalendar.activities.SimpleActivity
 import com.example.simplecalendar.adapters.EventListAdapter
@@ -146,11 +145,11 @@ class EventListFragment : MyFragmentHolder(), RefreshRecyclerViewListener {
     }
 
     private fun editEvent(event: ListEvent) {
-        Intent(context, EventActivity::class.java).apply {
-            putExtra(EVENT_ID, event.id)
-            putExtra(EVENT_OCCURRENCE_TS, event.startTS)
-            startActivity(this)
-        }
+//        Intent(context, EventActivity::class.java).apply {
+//            putExtra(EVENT_ID, event.id)
+//            putExtra(EVENT_OCCURRENCE_TS, event.startTS)
+//            startActivity(this)
+//        }
     }
 
     private fun fetchPreviousPeriod() {

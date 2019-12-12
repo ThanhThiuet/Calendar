@@ -140,7 +140,7 @@ class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, r
 
             ensureBackgroundThread {
                 val nonRepeatingEventIDs = eventsToDelete.asSequence().filter { it.repeatInterval == 0 }.mapNotNull { it.id }.toMutableList()
-                activity.eventsHelper.deleteEvents(nonRepeatingEventIDs, true)
+//                activity.eventsHelper.deleteEvents(nonRepeatingEventIDs, true)
 
                 val repeatingEventIDs = eventsToDelete.asSequence().filter { it.repeatInterval != 0 }.mapNotNull { it.id }.toList()
                 activity.handleEventDeleting(repeatingEventIDs, timestamps, it)

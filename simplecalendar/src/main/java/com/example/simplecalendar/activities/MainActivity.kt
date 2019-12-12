@@ -16,7 +16,6 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.simplecalendar.R
-import com.example.simplecalendar.databases.EventsDatabase
 import com.example.simplecalendar.extensions.*
 import com.example.simplecalendar.fragments.*
 import com.example.simplecalendar.helpers.*
@@ -50,10 +49,10 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        calendar_fab.beVisibleIf(config.storedView != YEARLY_VIEW)
-        calendar_fab.setOnClickListener {
-            launchNewEventIntent(currentFragments.last().getNewEventDayCode())
-        }
+//        calendar_fab.beVisibleIf(config.storedView != YEARLY_VIEW)
+//        calendar_fab.setOnClickListener {
+//            launchNewEventIntent(currentFragments.last().getNewEventDayCode())
+//        }
 
         storeStateVariables()
         if (resources.getBoolean(R.bool.portrait_only)) {
@@ -131,7 +130,7 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
     override fun onDestroy() {
         super.onDestroy()
         if (!isChangingConfigurations) {
-            EventsDatabase.destroyInstance()
+//            EventsDatabase.destroyInstance()
         }
     }
 
@@ -243,13 +242,13 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         val eventOccurrenceToOpen = intent.getLongExtra(EVENT_OCCURRENCE_TS, 0L)
         intent.removeExtra(EVENT_ID)
         intent.removeExtra(EVENT_OCCURRENCE_TS)
-        if (eventIdToOpen != 0L && eventOccurrenceToOpen != 0L) {
-            Intent(this, EventActivity::class.java).apply {
-                putExtra(EVENT_ID, eventIdToOpen)
-                putExtra(EVENT_OCCURRENCE_TS, eventOccurrenceToOpen)
-                startActivity(this)
-            }
-        }
+//        if (eventIdToOpen != 0L && eventOccurrenceToOpen != 0L) {
+//            Intent(this, EventActivity::class.java).apply {
+//                putExtra(EVENT_ID, eventIdToOpen)
+//                putExtra(EVENT_OCCURRENCE_TS, eventOccurrenceToOpen)
+//                startActivity(this)
+//            }
+//        }
 
         return false
     }
@@ -262,15 +261,15 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
                     ensureBackgroundThread {
                         // intents like content://com.android.calendar/events/1756
                         val eventId = uri.lastPathSegment
-                        val id = eventsDB.getEventIdWithLastImportId("%-$eventId")
-                        if (id != null) {
-                            Intent(this, EventActivity::class.java).apply {
-                                putExtra(EVENT_ID, id)
-                                startActivity(this)
-                            }
-                        } else {
-                            toast(R.string.caldav_event_not_found, Toast.LENGTH_LONG)
-                        }
+//                        val id = eventsDB.getEventIdWithLastImportId("%-$eventId")
+//                        if (id != null) {
+//                            Intent(this, EventActivity::class.java).apply {
+//                                putExtra(EVENT_ID, id)
+//                                startActivity(this)
+//                            }
+//                        } else {
+//                            toast(R.string.caldav_event_not_found, Toast.LENGTH_LONG)
+//                        }
                     }
                 } else if (intent?.extras?.getBoolean("DETAIL_VIEW", false) == true) {
                     // clicking date on a third party widget: content://com.android.calendar/time/1507309245683
@@ -311,11 +310,11 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
             toast(R.string.refreshing)
         }
 
-        syncCalDAVCalendars {
-            calDAVHelper.refreshCalendars(true) {
-                calDAVChanged()
-            }
-        }
+//        syncCalDAVCalendars {
+//            calDAVHelper.refreshCalendars(true) {
+//                calDAVChanged()
+//            }
+//        }
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

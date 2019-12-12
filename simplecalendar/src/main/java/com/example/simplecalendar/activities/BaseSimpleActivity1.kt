@@ -94,7 +94,7 @@ abstract class BaseSimpleActivity1 : AppCompatActivity()
         supportActionBar?.setBackgroundDrawable(ColorDrawable(color))
         updateActionBarTitle(supportActionBar?.title.toString(), color)
         updateStatusbarColor(color)
-        setTaskDescription(ActivityManager.TaskDescription(null, null, color))
+//        setTaskDescription(ActivityManager.TaskDescription(null, null, color))
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -125,8 +125,8 @@ abstract class BaseSimpleActivity1 : AppCompatActivity()
             val title = getAppLauncherName()
             val color = baseConfig.primaryColor
 
-            val description = ActivityManager.TaskDescription(title, recentsIcon, color)
-            setTaskDescription(description)
+//            val description = ActivityManager.TaskDescription(title, recentsIcon, color)
+//            setTaskDescription(description)
         }
     }
 
@@ -197,7 +197,7 @@ abstract class BaseSimpleActivity1 : AppCompatActivity()
                     toast(R.string.sd_card_usb_same)
                     return
                 }
-                baseConfig.OTGTreeUri = resultData.dataString.toString()
+//                baseConfig.OTGTreeUri = resultData.dataString.toString()
                 baseConfig.OTGPartition = baseConfig.OTGTreeUri.removeSuffix("%3A").substringAfterLast('/').trimEnd('/')
                 updateOTGPathFromPartition()
 

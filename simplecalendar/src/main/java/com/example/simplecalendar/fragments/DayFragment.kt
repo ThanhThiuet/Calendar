@@ -8,10 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.example.simplecalendar.R
-import com.example.simplecalendar.activities.EventActivity
 import com.example.simplecalendar.activities.MainActivity
 import com.example.simplecalendar.activities.SimpleActivity
 import com.example.simplecalendar.adapters.DayEventsAdapter
@@ -127,10 +125,10 @@ class DayFragment : Fragment() {
     }
 
     private fun editEvent(event: Event) {
-        Intent(context, EventActivity::class.java).apply {
-            putExtra(EVENT_ID, event.id)
-            putExtra(EVENT_OCCURRENCE_TS, event.startTS)
-            startActivity(this)
-        }
+//        Intent(context, EventActivity::class.java).apply {
+//            putExtra(EVENT_ID, event.id)
+//            putExtra(EVENT_OCCURRENCE_TS, event.startTS)
+//            startActivity(this)
+//        }
     }
 }

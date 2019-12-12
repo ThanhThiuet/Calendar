@@ -29,10 +29,10 @@ class SelectEventCalendarDialog(val activity: Activity, val calendars: List<CalD
 
         ensureBackgroundThread {
             calendars.forEach {
-                val localEventType = activity.eventsHelper.getEventTypeWithCalDAVCalendarId(it.id)
-                if (localEventType != null) {
-                    it.color = localEventType.color
-                }
+//                val localEventType = activity.eventsHelper.getEventTypeWithCalDAVCalendarId(it.id)
+//                if (localEventType != null) {
+//                    it.color = localEventType.color
+//                }
             }
 
             activity.runOnUiThread {

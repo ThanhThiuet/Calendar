@@ -39,54 +39,54 @@ class EditEventTypeDialog(val activity: Activity, var eventType: EventType? = nu
             }
         }
 
-        AlertDialog.Builder(activity)
-                .setPositiveButton(R.string.ok, null)
-                .setNegativeButton(R.string.cancel, null)
-                .create().apply {
-                    activity.setupDialogStuff(view, this, if (isNewEvent) R.string.add_new_type else R.string.edit_type) {
-                        showKeyboard(view.type_title)
-                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                            ensureBackgroundThread {
-                                eventTypeConfirmed(view.type_title.value, this)
-                            }
-                        }
-                    }
-                }
+//        AlertDialog.Builder(activity)
+//                .setPositiveButton(R.string.ok, null)
+//                .setNegativeButton(R.string.cancel, null)
+//                .create().apply {
+//                    activity.setupDialogStuff(view, this, if (isNewEvent) R.string.add_new_type else R.string.edit_type) {
+//                        showKeyboard(view.type_title)
+//                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+//                            ensureBackgroundThread {
+//                                eventTypeConfirmed(view.type_title.value, this)
+//                            }
+//                        }
+//                    }
+//                }
     }
 
     private fun setupColor(view: ImageView) {
         view.setFillWithStroke(eventType!!.color, activity.config.backgroundColor)
     }
 
-    private fun eventTypeConfirmed(title: String, dialog: AlertDialog) {
-        val eventIdWithTitle = activity.eventsHelper.getEventTypeIdWithTitle(title)
-        var isEventTypeTitleTaken = isNewEvent && eventIdWithTitle != -1L
-        if (!isEventTypeTitleTaken) {
-            isEventTypeTitleTaken = !isNewEvent && eventType!!.id != eventIdWithTitle && eventIdWithTitle != -1L
-        }
-
-        if (title.isEmpty()) {
-            activity.toast(R.string.title_empty)
-            return
-        } else if (isEventTypeTitleTaken) {
-            activity.toast(R.string.type_already_exists)
-            return
-        }
-
-        eventType!!.title = title
-        if (eventType!!.caldavCalendarId != 0) {
-            eventType!!.caldavDisplayName = title
-        }
-
-        eventType!!.id = activity.eventsHelper.insertOrUpdateEventTypeSync(eventType!!)
-
-        if (eventType!!.id != -1L) {
-            activity.runOnUiThread {
-                dialog.dismiss()
-                callback(eventType!!)
-            }
-        } else {
-            activity.toast(R.string.editing_calendar_failed)
-        }
-    }
+//    private fun eventTypeConfirmed(title: String, dialog: AlertDialog) {
+//        val eventIdWithTitle = activity.eventsHelper.getEventTypeIdWithTitle(title)
+//        var isEventTypeTitleTaken = isNewEvent && eventIdWithTitle != -1L
+//        if (!isEventTypeTitleTaken) {
+//            isEventTypeTitleTaken = !isNewEvent && eventType!!.id != eventIdWithTitle && eventIdWithTitle != -1L
+//        }
+//
+//        if (title.isEmpty()) {
+//            activity.toast(R.string.title_empty)
+//            return
+//        } else if (isEventTypeTitleTaken) {
+//            activity.toast(R.string.type_already_exists)
+//            return
+//        }
+//
+//        eventType!!.title = title
+//        if (eventType!!.caldavCalendarId != 0) {
+//            eventType!!.caldavDisplayName = title
+//        }
+//
+//        eventType!!.id = activity.eventsHelper.insertOrUpdateEventTypeSync(eventType!!)
+//
+//        if (eventType!!.id != -1L) {
+//            activity.runOnUiThread {
+//                dialog.dismiss()
+//                callback(eventType!!)
+//            }
+//        } else {
+//            activity.toast(R.string.editing_calendar_failed)
+//        }
+//    }
 }

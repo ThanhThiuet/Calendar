@@ -2,7 +2,6 @@ package com.example.simplecalendar.helpers
 
 import com.example.simplecalendar.R
 import com.example.simplecalendar.extensions.calDAVHelper
-import com.example.simplecalendar.extensions.eventTypesDB
 import com.example.simplecalendar.helpers.IcsExporter.ExportResult.*
 import com.example.simplecalendar.models.CalDAVCalendar
 import com.example.simplecalendar.models.Event
@@ -47,8 +46,8 @@ class IcsExporter {
                         event.title.replace("\n", "\\n").let { if (it.isNotEmpty()) out.writeLn("$SUMMARY:$it") }
                         event.description.replace("\n", "\\n").let { if (it.isNotEmpty()) out.writeLn("$DESCRIPTION$it") }
                         event.importId.let { if (it.isNotEmpty()) out.writeLn("$UID$it") }
-                        event.eventType.let { out.writeLn("$CATEGORY_COLOR${activity.eventTypesDB.getEventTypeWithId(it)?.color}") }
-                        event.eventType.let { out.writeLn("$CATEGORIES${activity.eventTypesDB.getEventTypeWithId(it)?.title}") }
+//                        event.eventType.let { out.writeLn("$CATEGORY_COLOR${activity.eventTypesDB.getEventTypeWithId(it)?.color}") }
+//                        event.eventType.let { out.writeLn("$CATEGORIES${activity.eventTypesDB.getEventTypeWithId(it)?.title}") }
                         event.lastUpdated.let { out.writeLn("$LAST_MODIFIED:${Formatter.getExportedTime(it)}") }
                         event.location.let { if (it.isNotEmpty()) out.writeLn("$LOCATION:$it") }
 

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
-import com.example.simplecalendar.extensions.eventsDB
 import com.example.simplecalendar.extensions.updateListWidget
 import com.example.simplecalendar.helpers.EVENT_ID
 import com.example.simplecalendar.helpers.REMINDER_NOTIFICATION
@@ -28,10 +27,10 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         context.updateListWidget()
-        val event = context.eventsDB.getEventWithId(id)
-        if (event == null || event.getReminders().none { it.type == REMINDER_NOTIFICATION }) {
-            return
-        }
+//        val event = context.eventsDB.getEventWithId(id)
+//        if (event == null || event.getReminders().none { it.type == REMINDER_NOTIFICATION }) {
+//            return
+//        }
 
 //        if (!event.repetitionExceptions.contains(Formatter.getDayCodeFromTS(event.startTS))) {
 //            context.notifyEvent(event)

@@ -21,12 +21,8 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.app.AlarmManagerCompat
 import com.example.simplecalendar.R
-import com.example.simplecalendar.activities.EventActivity
-import com.example.simplecalendar.databases.EventsDatabase
 import com.example.simplecalendar.helpers.*
 import com.example.simplecalendar.helpers.Formatter
-import com.example.simplecalendar.interfaces.EventTypesDao
-import com.example.simplecalendar.interfaces.EventsDao
 import com.example.simplecalendar.models.*
 import com.example.simplecalendar.receivers.CalDAVSyncReceiver
 import com.example.simplecalendar.receivers.NotificationReceiver
@@ -37,8 +33,8 @@ import org.joda.time.DateTimeZone
 import java.util.*
 
 val Context.config: Config get() = Config.newInstance(applicationContext)
-val Context.eventsDB: EventsDao get() = EventsDatabase.getInstance(applicationContext).EventsDao()
-val Context.eventTypesDB: EventTypesDao get() = EventsDatabase.getInstance(applicationContext).EventTypesDao()
+//val Context.eventsDB: EventsDao get() = EventsDatabase.getInstance(applicationContext).EventsDao()
+//val Context.eventTypesDB: EventTypesDao get() = EventsDatabase.getInstance(applicationContext).EventTypesDao()
 val Context.eventsHelper: EventsHelper get() = EventsHelper(this)
 val Context.calDAVHelper: CalDAVHelper get() = CalDAVHelper(this)
 
@@ -83,11 +79,11 @@ fun Context.getRepetitionText(seconds: Int) = when (seconds) {
 }
 
 fun Context.launchNewEventIntent(dayCode: String = Formatter.getTodayCode()) {
-    Intent(applicationContext, EventActivity::class.java).apply {
-        putExtra(NEW_EVENT_START_TS, getNewEventTimestampFromCode(dayCode))
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(this)
-    }
+//    Intent(applicationContext, EventActivity::class.java).apply {
+//        putExtra(NEW_EVENT_START_TS, getNewEventTimestampFromCode(dayCode))
+//        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//        startActivity(this)
+//    }
 }
 
 fun Context.getNewEventTimestampFromCode(dayCode: String): Long {
@@ -110,7 +106,7 @@ fun Context.getNewEventTimestampFromCode(dayCode: String): Long {
 fun Context.recheckCalDAVCalendars(callback: () -> Unit) {
     if (config.caldavSync) {
         ensureBackgroundThread {
-            calDAVHelper.refreshCalendars(false, callback)
+//            calDAVHelper.refreshCalendars(false, callback)
             updateWidgets()
         }
     }
@@ -245,16 +241,16 @@ fun Context.handleEventDeleting(eventIds: List<Long>, timestamps: List<Long>, ac
     when (action) {
         DELETE_SELECTED_OCCURRENCE -> {
             eventIds.forEachIndexed { index, value ->
-                eventsHelper.addEventRepetitionException(value, timestamps[index], true)
+//                eventsHelper.addEventRepetitionException(value, timestamps[index], true)
             }
         }
         DELETE_FUTURE_OCCURRENCES -> {
             eventIds.forEachIndexed { index, value ->
-                eventsHelper.addEventRepeatLimit(value, timestamps[index])
+//                eventsHelper.addEventRepeatLimit(value, timestamps[index])
             }
         }
         DELETE_ALL_OCCURRENCES -> {
-            eventsHelper.deleteEvents(eventIds.toMutableList(), true)
+//            eventsHelper.deleteEvents(eventIds.toMutableList(), true)
         }
     }
 }

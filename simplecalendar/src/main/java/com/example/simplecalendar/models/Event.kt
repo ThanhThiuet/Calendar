@@ -1,41 +1,37 @@
 package com.example.simplecalendar.models
 
 import androidx.collection.LongSparseArray
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
 import com.example.simplecalendar.extensions.seconds
 import com.example.simplecalendar.helpers.*
 import com.simplemobiletools.commons.extensions.addBitIf
 import org.joda.time.DateTime
 import java.io.Serializable
 
-@Entity(tableName = "events", indices = [(Index(value = ["id"], unique = true))])
+//@Entity(tableName = "events", indices = [(Index(value = ["id"], unique = true))])
 data class Event(
-        @PrimaryKey(autoGenerate = true) var id: Long?,
-        @ColumnInfo(name = "start_ts") var startTS: Long = 0L,
-        @ColumnInfo(name = "end_ts") var endTS: Long = 0L,
-        @ColumnInfo(name = "title") var title: String = "",
-        @ColumnInfo(name = "location") var location: String = "",
-        @ColumnInfo(name = "description") var description: String = "",
-        @ColumnInfo(name = "reminder_1_minutes") var reminder1Minutes: Int = -1,
-        @ColumnInfo(name = "reminder_2_minutes") var reminder2Minutes: Int = -1,
-        @ColumnInfo(name = "reminder_3_minutes") var reminder3Minutes: Int = -1,
-        @ColumnInfo(name = "reminder_1_type") var reminder1Type: Int = REMINDER_NOTIFICATION,
-        @ColumnInfo(name = "reminder_2_type") var reminder2Type: Int = REMINDER_NOTIFICATION,
-        @ColumnInfo(name = "reminder_3_type") var reminder3Type: Int = REMINDER_NOTIFICATION,
-        @ColumnInfo(name = "repeat_interval") var repeatInterval: Int = 0,
-        @ColumnInfo(name = "repeat_rule") var repeatRule: Int = 0,
-        @ColumnInfo(name = "repeat_limit") var repeatLimit: Long = 0L,
-        @ColumnInfo(name = "repetition_exceptions") var repetitionExceptions: ArrayList<String> = ArrayList(),
-        @ColumnInfo(name = "attendees") var attendees: String = "",
-        @ColumnInfo(name = "import_id") var importId: String = "",
-        @ColumnInfo(name = "flags") var flags: Int = 0,
-        @ColumnInfo(name = "event_type") var eventType: Long = REGULAR_EVENT_TYPE_ID,
-        @ColumnInfo(name = "parent_id") var parentId: Long = 0,
-        @ColumnInfo(name = "last_updated") var lastUpdated: Long = 0L,
-        @ColumnInfo(name = "source") var source: String = SOURCE_SIMPLE_CALENDAR)
+         var id: Long?,
+        var startTS: Long = 0L,
+        var endTS: Long = 0L,
+         var title: String = "",
+         var location: String = "",
+         var description: String = "",
+         var reminder1Minutes: Int = -1,
+         var reminder2Minutes: Int = -1,
+        var reminder3Minutes: Int = -1,
+         var reminder1Type: Int = REMINDER_NOTIFICATION,
+        var reminder2Type: Int = REMINDER_NOTIFICATION,
+         var reminder3Type: Int = REMINDER_NOTIFICATION,
+         var repeatInterval: Int = 0,
+         var repeatRule: Int = 0,
+         var repeatLimit: Long = 0L,
+         var repetitionExceptions: ArrayList<String> = ArrayList(),
+         var attendees: String = "",
+         var importId: String = "",
+         var flags: Int = 0,
+         var eventType: Long = REGULAR_EVENT_TYPE_ID,
+         var parentId: Long = 0,
+         var lastUpdated: Long = 0L,
+         var source: String = SOURCE_SIMPLE_CALENDAR)
     : Serializable {
 
     companion object {

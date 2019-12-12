@@ -41,7 +41,7 @@ class ManageEventTypesActivity : SimpleActivity(), DeleteEventTypesListener {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_event_types, menu)
-        updateMenuItemColors(menu)
+//        updateMenuItemColors(menu)
         return true
     }
 
@@ -62,7 +62,7 @@ class ManageEventTypesActivity : SimpleActivity(), DeleteEventTypesListener {
         }
 
         ensureBackgroundThread {
-            eventsHelper.deleteEventTypes(eventTypes, deleteEvents)
+//            eventsHelper.deleteEventTypes(eventTypes, deleteEvents)
         }
         return true
     }

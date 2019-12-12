@@ -206,7 +206,7 @@ class EventListAdapter(activity: SimpleActivity, var listItems: ArrayList<ListIt
 
             ensureBackgroundThread {
                 val nonRepeatingEventIDs = eventsToDelete.filter { !it.isRepeatable }.mapNotNull { it.id }.toMutableList()
-                activity.eventsHelper.deleteEvents(nonRepeatingEventIDs, true)
+//                activity.eventsHelper.deleteEvents(nonRepeatingEventIDs, true)
 
                 val repeatingEventIDs = eventsToDelete.filter { it.isRepeatable }.map { it.id }
                 activity.handleEventDeleting(repeatingEventIDs, timestamps, it)
