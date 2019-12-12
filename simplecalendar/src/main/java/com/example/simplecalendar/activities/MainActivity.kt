@@ -97,12 +97,12 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
             updateViewPager()
         }
 
-        eventsHelper.getEventTypes(this, false) {
-            val newShouldFilterBeVisible = it.size > 1 || config.displayEventTypes.isEmpty()
-            if (newShouldFilterBeVisible != mShouldFilterBeVisible) {
-                mShouldFilterBeVisible = newShouldFilterBeVisible
-            }
-        }
+//        eventsHelper.getEventTypes(this, false) {
+//            val newShouldFilterBeVisible = it.size > 1 || config.displayEventTypes.isEmpty()
+//            if (newShouldFilterBeVisible != mShouldFilterBeVisible) {
+//                mShouldFilterBeVisible = newShouldFilterBeVisible
+//            }
+//        }
 
         if (config.storedView == WEEKLY_VIEW) {
             if (mStoredIsSundayFirst != config.isSundayFirst || mStoredUse24HourFormat != config.use24HourFormat) {

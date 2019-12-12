@@ -5,10 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.simplecalendar.R
 import com.example.simplecalendar.activities.SimpleActivity
-import com.example.simplecalendar.dialogs.DeleteEventDialog
 import com.example.simplecalendar.extensions.config
-import com.example.simplecalendar.extensions.eventsHelper
-import com.example.simplecalendar.extensions.handleEventDeleting
 import com.example.simplecalendar.helpers.Formatter
 import com.example.simplecalendar.helpers.ITEM_EVENT
 import com.example.simplecalendar.helpers.ITEM_EVENT_SIMPLE
@@ -18,7 +15,6 @@ import com.simplemobiletools.commons.extensions.adjustAlpha
 import com.simplemobiletools.commons.extensions.applyColorFilter
 import com.simplemobiletools.commons.extensions.beInvisible
 import com.simplemobiletools.commons.extensions.beInvisibleIf
-import com.simplemobiletools.commons.helpers.ensureBackgroundThread
 import com.simplemobiletools.commons.views.MyRecyclerView
 import kotlinx.android.synthetic.main.event_item_day_view.view.*
 
@@ -37,11 +33,7 @@ class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, r
 
     override fun prepareActionMode(menu: Menu) {}
 
-    override fun actionItemPressed(id: Int) {
-        when (id) {
-            R.id.cab_delete -> askConfirmDelete()
-        }
-    }
+    override fun actionItemPressed(id: Int) {}
 
     override fun getSelectableItemCount() = events.size
 
@@ -135,19 +127,6 @@ class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, r
         val positions = getSelectedItemPositions()
 
         val hasRepeatableEvent = eventsToDelete.any { it.repeatInterval > 0 }
-        DeleteEventDialog(activity, eventIds, hasRepeatableEvent) { it ->
-            events.removeAll(eventsToDelete)
 
-            ensureBackgroundThread {
-                val nonRepeatingEventIDs = eventsToDelete.asSequence().filter { it.repeatInterval == 0 }.mapNotNull { it.id }.toMutableList()
-//                activity.eventsHelper.deleteEvents(nonRepeatingEventIDs, true)
-
-                val repeatingEventIDs = eventsToDelete.asSequence().filter { it.repeatInterval != 0 }.mapNotNull { it.id }.toList()
-                activity.handleEventDeleting(repeatingEventIDs, timestamps, it)
-                activity.runOnUiThread {
-                    removeSelectedItems(positions)
-                }
-            }
-        }
     }
 }
