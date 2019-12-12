@@ -1,19 +1,13 @@
 package com.example.simplecalendar.helpers
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.util.Log
-import androidx.collection.LongSparseArray
-import com.example.simplecalendar.R
-import com.example.simplecalendar.extensions.*
+import com.example.simplecalendar.extensions.config
+import com.example.simplecalendar.extensions.seconds
 import com.example.simplecalendar.models.Event
-import com.example.simplecalendar.models.EventType
-import com.simplemobiletools.commons.extensions.getChoppedList
 import com.simplemobiletools.commons.helpers.ensureBackgroundThread
 import org.joda.time.DateTime
-import java.util.*
-import kotlin.collections.ArrayList
 
 class EventsHelper(val context: Context) {
     private val config = context.config
@@ -37,7 +31,7 @@ class EventsHelper(val context: Context) {
 
         val events: ArrayList<Event> = ArrayList()
 
-        val newImportId = "b08747857cb44e1b879c837b9e016e091575271897414" /*""*/ /*UUID.randomUUID().toString().replace("-", "") + System.currentTimeMillis().toString()*/
+        val newImportId = "b08747857cb44e1b879c837b9e016e091575271897414"
         val currentTimestamp = System.currentTimeMillis()
         val listString: ArrayList<String> = ArrayList()
         val date: DateTime = Formatter.getDateTimeFromTS(currentTimestamp / 1000L)

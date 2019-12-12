@@ -13,16 +13,23 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.simplecalendar.R
-import com.example.simplecalendar.extensions.*
-import com.example.simplecalendar.fragments.*
+import com.example.simplecalendar.extensions.config
+import com.example.simplecalendar.extensions.seconds
+import com.example.simplecalendar.extensions.updateWidgets
+import com.example.simplecalendar.fragments.DayFragmentsHolder
+import com.example.simplecalendar.fragments.EventListFragment
+import com.example.simplecalendar.fragments.MonthFragmentsHolder
+import com.example.simplecalendar.fragments.MyFragmentHolder
 import com.example.simplecalendar.helpers.*
 import com.example.simplecalendar.helpers.Formatter
 import com.example.simplecalendar.jobs.CalDAVUpdateListener
 import com.simplemobiletools.commons.extensions.*
-import com.simplemobiletools.commons.helpers.*
+import com.simplemobiletools.commons.helpers.PERMISSION_READ_CALENDAR
+import com.simplemobiletools.commons.helpers.PERMISSION_WRITE_CALENDAR
+import com.simplemobiletools.commons.helpers.isNougatMR1Plus
+import com.simplemobiletools.commons.helpers.isNougatPlus
 import com.simplemobiletools.commons.interfaces.RefreshRecyclerViewListener
 import kotlinx.android.synthetic.main.activity_main.*
 import org.joda.time.DateTime
@@ -30,8 +37,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
-    private var showCalDAVRefreshToast = false
-    private var mShouldFilterBeVisible = false
     private var shouldGoToTodayBeVisible = false
     private var goToTodayButton: MenuItem? = null
     private var currentFragments = ArrayList<MyFragmentHolder>()
@@ -49,11 +54,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        calendar_fab.beVisibleIf(config.storedView != YEARLY_VIEW)
-//        calendar_fab.setOnClickListener {
-//            launchNewEventIntent(currentFragments.last().getNewEventDayCode())
-//        }
-
         storeStateVariables()
         if (resources.getBoolean(R.bool.portrait_only)) {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -61,14 +61,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
 
         if (!hasPermission(PERMISSION_WRITE_CALENDAR) || !hasPermission(PERMISSION_READ_CALENDAR)) {
             config.caldavSync = false
-        }
-
-        if (config.caldavSync) {
-            refreshCalDAVCalendars(false)
-        }
-
-        swipe_refresh_layout.setOnRefreshListener {
-            refreshCalDAVCalendars(false)
         }
 
         checkIsViewIntent()
@@ -97,13 +89,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
             updateViewPager()
         }
 
-//        eventsHelper.getEventTypes(this, false) {
-//            val newShouldFilterBeVisible = it.size > 1 || config.displayEventTypes.isEmpty()
-//            if (newShouldFilterBeVisible != mShouldFilterBeVisible) {
-//                mShouldFilterBeVisible = newShouldFilterBeVisible
-//            }
-//        }
-
         if (config.storedView == WEEKLY_VIEW) {
             if (mStoredIsSundayFirst != config.isSundayFirst || mStoredUse24HourFormat != config.use24HourFormat) {
                 updateViewPager()
@@ -125,13 +110,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
     override fun onPause() {
         super.onPause()
         storeStateVariables()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (!isChangingConfigurations) {
-//            EventsDatabase.destroyInstance()
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -242,13 +220,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         val eventOccurrenceToOpen = intent.getLongExtra(EVENT_OCCURRENCE_TS, 0L)
         intent.removeExtra(EVENT_ID)
         intent.removeExtra(EVENT_OCCURRENCE_TS)
-//        if (eventIdToOpen != 0L && eventOccurrenceToOpen != 0L) {
-//            Intent(this, EventActivity::class.java).apply {
-//                putExtra(EVENT_ID, eventIdToOpen)
-//                putExtra(EVENT_OCCURRENCE_TS, eventOccurrenceToOpen)
-//                startActivity(this)
-//            }
-//        }
 
         return false
     }
@@ -257,21 +228,7 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         if (intent?.action == Intent.ACTION_VIEW && intent.data != null) {
             val uri = intent.data
             if (uri?.authority == "com.android.calendar") {
-                if (uri.path?.startsWith("/events")!!) {
-                    ensureBackgroundThread {
-                        // intents like content://com.android.calendar/events/1756
-                        val eventId = uri.lastPathSegment
-//                        val id = eventsDB.getEventIdWithLastImportId("%-$eventId")
-//                        if (id != null) {
-//                            Intent(this, EventActivity::class.java).apply {
-//                                putExtra(EVENT_ID, id)
-//                                startActivity(this)
-//                            }
-//                        } else {
-//                            toast(R.string.caldav_event_not_found, Toast.LENGTH_LONG)
-//                        }
-                    }
-                } else if (intent?.extras?.getBoolean("DETAIL_VIEW", false) == true) {
+                if (intent?.extras?.getBoolean("DETAIL_VIEW", false) == true) {
                     // clicking date on a third party widget: content://com.android.calendar/time/1507309245683
                     val timestamp = uri.pathSegments.last()
                     if (timestamp.areDigitsOnly()) {
@@ -303,31 +260,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private fun refreshCalDAVCalendars(showRefreshToast: Boolean) {
-        showCalDAVRefreshToast = showRefreshToast
-        if (showRefreshToast) {
-            toast(R.string.refreshing)
-        }
-
-//        syncCalDAVCalendars {
-//            calDAVHelper.refreshCalendars(true) {
-//                calDAVChanged()
-//            }
-//        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private fun calDAVChanged() {
-        refreshViewPager()
-        if (showCalDAVRefreshToast) {
-            toast(R.string.refreshing_complete)
-        }
-        runOnUiThread {
-            swipe_refresh_layout.isRefreshing = false
-        }
-    }
-
     private fun updateViewPager(dayCode: String? = Formatter.getTodayCode()) {
         val fragment = getFragmentsHolder()
         currentFragments.forEach {
@@ -344,22 +276,6 @@ class MainActivity : SimpleActivity(), RefreshRecyclerViewListener {
 
         fragment.arguments = bundle
         supportFragmentManager.beginTransaction().add(R.id.fragments_holder, fragment).commitNow()
-    }
-
-    fun openMonthFromYearly(dateTime: DateTime) {
-        if (currentFragments.last() is MonthFragmentsHolder) {
-            return
-        }
-
-        val fragment = MonthFragmentsHolder()
-        currentFragments.add(fragment)
-        val bundle = Bundle()
-        bundle.putString(DAY_CODE, Formatter.getDayCodeFromDateTime(dateTime))
-        fragment.arguments = bundle
-        supportFragmentManager.beginTransaction().add(R.id.fragments_holder, fragment).commitNow()
-//        resetActionBarTitle()
-        calendar_fab.beVisible()
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     fun openDayFromMonthly(dateTime: DateTime) {
