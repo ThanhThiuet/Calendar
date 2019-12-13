@@ -151,22 +151,6 @@ abstract class MyRecyclerViewAdapter1(val activity: BaseSimpleActivity1, val rec
         }
     }
 
-    protected fun getSelectedItemPositions(sortDescending: Boolean = true): ArrayList<Int> {
-        val positions = ArrayList<Int>()
-        val keys = selectedKeys.toList()
-        keys.forEach {
-            val position = getItemKeyPosition(it)
-            if (position != -1) {
-                positions.add(position)
-            }
-        }
-
-        if (sortDescending) {
-            positions.sortDescending()
-        }
-        return positions
-    }
-
     protected fun selectAll() {
         val cnt = itemCount - positionOffset
         for (i in 0 until cnt) {
@@ -232,10 +216,6 @@ abstract class MyRecyclerViewAdapter1(val activity: BaseSimpleActivity1, val rec
         }
     }
 
-    fun setupZoomListener(zoomListener: MyRecyclerView.MyZoomListener?) {
-        recyclerView.setupZoomListener(zoomListener)
-    }
-
     fun addVerticalDividers(add: Boolean) {
         if (recyclerView.itemDecorationCount > 0) {
             recyclerView.removeItemDecorationAt(0)
@@ -273,14 +253,6 @@ abstract class MyRecyclerViewAdapter1(val activity: BaseSimpleActivity1, val rec
 
     protected fun bindViewHolder(holder: ViewHolder) {
         holder.itemView.tag = holder
-    }
-
-    protected fun removeSelectedItems(positions: ArrayList<Int>) {
-        positions.forEach {
-            notifyItemRemoved(it)
-        }
-        finishActMode()
-        fastScroller?.measureRecyclerView()
     }
 
     open inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

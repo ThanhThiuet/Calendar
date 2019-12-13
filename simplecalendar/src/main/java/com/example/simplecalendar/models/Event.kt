@@ -7,68 +7,34 @@ import com.simplemobiletools.commons.extensions.addBitIf
 import org.joda.time.DateTime
 import java.io.Serializable
 
-//@Entity(tableName = "events", indices = [(Index(value = ["id"], unique = true))])
 data class Event(
-         var id: Long?,
+        var id: Long?,
         var startTS: Long = 0L,
         var endTS: Long = 0L,
-         var title: String = "",
-         var location: String = "",
-         var description: String = "",
-         var reminder1Minutes: Int = -1,
-         var reminder2Minutes: Int = -1,
+        var title: String = "",
+        var location: String = "",
+        var description: String = "",
+        var reminder1Minutes: Int = -1,
+        var reminder2Minutes: Int = -1,
         var reminder3Minutes: Int = -1,
-         var reminder1Type: Int = REMINDER_NOTIFICATION,
+        var reminder1Type: Int = REMINDER_NOTIFICATION,
         var reminder2Type: Int = REMINDER_NOTIFICATION,
-         var reminder3Type: Int = REMINDER_NOTIFICATION,
-         var repeatInterval: Int = 0,
-         var repeatRule: Int = 0,
-         var repeatLimit: Long = 0L,
-         var repetitionExceptions: ArrayList<String> = ArrayList(),
-         var attendees: String = "",
-         var importId: String = "",
-         var flags: Int = 0,
-         var eventType: Long = REGULAR_EVENT_TYPE_ID,
-         var parentId: Long = 0,
-         var lastUpdated: Long = 0L,
-         var source: String = SOURCE_SIMPLE_CALENDAR)
+        var reminder3Type: Int = REMINDER_NOTIFICATION,
+        var repeatInterval: Int = 0,
+        var repeatRule: Int = 0,
+        var repeatLimit: Long = 0L,
+        var repetitionExceptions: ArrayList<String> = ArrayList(),
+        var attendees: String = "",
+        var importId: String = "",
+        var flags: Int = 0,
+        var eventType: Long = REGULAR_EVENT_TYPE_ID,
+        var parentId: Long = 0,
+        var lastUpdated: Long = 0L,
+        var source: String = SOURCE_SIMPLE_CALENDAR)
     : Serializable {
 
     companion object {
         private const val serialVersionUID = -32456795132345616L
-    }
-
-    fun addIntervalTime(original: Event) {
-        val oldStart = Formatter.getDateTimeFromTS(startTS)
-        val newStart: DateTime
-        newStart = when (repeatInterval) {
-            DAY -> oldStart.plusDays(1)
-            else -> {
-                when {
-                    repeatInterval % YEAR == 0 -> when (repeatRule) {
-                        REPEAT_ORDER_WEEKDAY -> addXthDayInterval(oldStart, original, false)
-                        REPEAT_ORDER_WEEKDAY_USE_LAST -> addXthDayInterval(oldStart, original, true)
-                        else -> oldStart.plusYears(repeatInterval / YEAR)
-                    }
-                    repeatInterval % MONTH == 0 -> when (repeatRule) {
-                        REPEAT_SAME_DAY -> addMonthsWithSameDay(oldStart, original)
-                        REPEAT_ORDER_WEEKDAY -> addXthDayInterval(oldStart, original, false)
-                        REPEAT_ORDER_WEEKDAY_USE_LAST -> addXthDayInterval(oldStart, original, true)
-                        else -> oldStart.plusMonths(repeatInterval / MONTH).dayOfMonth().withMaximumValue()
-                    }
-                    repeatInterval % WEEK == 0 -> {
-                        // step through weekly repetition by days too, as events can trigger multiple times a week
-                        oldStart.plusDays(1)
-                    }
-                    else -> oldStart.plusSeconds(repeatInterval)
-                }
-            }
-        }
-
-        val newStartTS = newStart.seconds()
-        val newEndTS = newStartTS + (endTS - startTS)
-        startTS = newStartTS
-        endTS = newEndTS
     }
 
     // if an event should happen on 31st with Same Day monthly repetition, dont show it at all at months with 30 or less days
@@ -141,14 +107,6 @@ data class Event(
 
     fun getCalDAVCalendarId() = if (source.startsWith(CALDAV)) (source.split("-").lastOrNull() ?: "0").toString().toInt() else 0
 
-    // check if its the proper week, for events repeating every x weeks
-    // get the week number since 1970, not just in the current year
-    fun isOnProperWeek(startTimes: LongSparseArray<Long>): Boolean {
-        val initialWeekNumber = Formatter.getDateTimeFromTS(startTimes[id!!]!!).millis / (7 * 24 * 60 * 60 * 1000)
-        val currentWeekNumber = Formatter.getDateTimeFromTS(startTS).millis / (7 * 24 * 60 * 60 * 1000)
-        return (initialWeekNumber - currentWeekNumber) % (repeatInterval / WEEK) == 0L
-    }
-
     fun updateIsPastEvent() {
         val endTSToCheck = if (startTS < getNowSeconds() && getIsAllDay()) {
             Formatter.getDayEndTS(Formatter.getDayCodeFromTS(endTS))
@@ -156,13 +114,6 @@ data class Event(
             endTS
         }
         isPastEvent = endTSToCheck < getNowSeconds()
-    }
-
-    fun addRepetitionException(daycode: String) {
-        var newRepetitionExceptions = repetitionExceptions
-        newRepetitionExceptions.add(daycode)
-        newRepetitionExceptions = newRepetitionExceptions.distinct().toMutableList() as ArrayList<String>
-        repetitionExceptions = newRepetitionExceptions
     }
 
     var isPastEvent: Boolean

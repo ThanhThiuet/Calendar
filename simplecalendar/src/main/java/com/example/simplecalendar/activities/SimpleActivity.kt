@@ -1,12 +1,8 @@
 package com.example.simplecalendar.activities
 
-import android.os.Handler
 import com.example.simplecalendar.R
 
 open class SimpleActivity : BaseSimpleActivity1() {
-    val CALDAV_REFRESH_DELAY = 3000L
-    val calDAVRefreshHandler = Handler()
-    var calDAVRefreshCallback: (() -> Unit)? = null
 
     override fun getAppIconIDs() = arrayListOf(
             R.mipmap.ic_launcher_red,

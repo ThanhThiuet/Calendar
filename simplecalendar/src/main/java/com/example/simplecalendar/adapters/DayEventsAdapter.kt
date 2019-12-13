@@ -119,14 +119,4 @@ class DayEventsAdapter(activity: SimpleActivity, val events: ArrayList<Event>, r
             event_item_description?.setTextColor(newTextColor)
         }
     }
-
-    private fun askConfirmDelete() {
-        val eventIds = selectedKeys.map { it.toLong() }.toMutableList()
-        val eventsToDelete = events.filter { selectedKeys.contains(it.id?.toInt()) }
-        val timestamps = eventsToDelete.map { it.startTS }
-        val positions = getSelectedItemPositions()
-
-        val hasRepeatableEvent = eventsToDelete.any { it.repeatInterval > 0 }
-
-    }
 }

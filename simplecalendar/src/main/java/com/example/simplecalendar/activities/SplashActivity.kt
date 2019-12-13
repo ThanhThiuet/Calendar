@@ -1,10 +1,8 @@
 package com.example.simplecalendar.activities
 
 import android.content.Intent
-import com.example.simplecalendar.extensions.getNewEventTimestampFromCode
 import com.example.simplecalendar.helpers.*
 import com.simplemobiletools.commons.activities.BaseSplashActivity
-import org.joda.time.DateTime
 
 class SplashActivity : BaseSplashActivity() {
     override fun initActivity() {
