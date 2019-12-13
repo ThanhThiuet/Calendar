@@ -116,19 +116,9 @@ class DayFragment : Fragment() {
         if (activity == null)
             return
 
-        DayEventsAdapter(activity as SimpleActivity, events, mHolder.day_events) {
-            editEvent(it as Event)
-        }.apply {
+        DayEventsAdapter(activity as SimpleActivity, events, mHolder.day_events) {}.apply {
             addVerticalDividers(true)
             mHolder.day_events.adapter = this
         }
-    }
-
-    private fun editEvent(event: Event) {
-//        Intent(context, EventActivity::class.java).apply {
-//            putExtra(EVENT_ID, event.id)
-//            putExtra(EVENT_OCCURRENCE_TS, event.startTS)
-//            startActivity(this)
-//        }
     }
 }

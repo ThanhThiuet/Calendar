@@ -1,10 +1,8 @@
 package com.example.simplecalendar.activities
 
 import android.content.Intent
-import com.example.simplecalendar.extensions.getNewEventTimestampFromCode
 import com.example.simplecalendar.helpers.*
 import com.simplemobiletools.commons.activities.BaseSplashActivity
-import org.joda.time.DateTime
 
 class SplashActivity : BaseSplashActivity() {
     override fun initActivity() {
@@ -19,13 +17,6 @@ class SplashActivity : BaseSplashActivity() {
                 putExtra(EVENT_OCCURRENCE_TS, intent.getLongExtra(EVENT_OCCURRENCE_TS, 0L))
                 startActivity(this)
             }
-//            intent.action == SHORTCUT_NEW_EVENT -> {
-//                val dayCode = Formatter.getDayCodeFromDateTime(DateTime())
-//                Intent(this, EventActivity::class.java).apply {
-//                    putExtra(NEW_EVENT_START_TS, getNewEventTimestampFromCode(dayCode))
-//                    startActivity(this)
-//                }
-//            }
             else -> startActivity(Intent(this, MainActivity::class.java))
         }
         finish()

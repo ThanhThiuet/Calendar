@@ -20,9 +20,7 @@
         </activity>
 
         <activity android:name="com.example.simplecalendar.activities.MainActivity"/>
-        <activity android:name="com.example.simplecalendar.activities.EventActivity"/>
         <activity android:name="com.example.simplecalendar.activities.SplashActivity"/>
-        <activity android:name="com.example.simplecalendar.activities.ManageEventTypesActivity"/>
         <activity android:name="com.example.simplecalendar.activities.SimpleActivity"/>
     </application>
 
